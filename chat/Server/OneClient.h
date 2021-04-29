@@ -23,7 +23,7 @@ public:
 	bool waitingOtherToConnenct;
 
 	__event void NewComeToChat(OneClient &client);
-	__event void tryToConnect(OneClient &client,const std::string &name);
+	__event void TryToConnect(OneClient &client,std::string &name);
 
 	std::string getName();
 	SOCKET getSocket();

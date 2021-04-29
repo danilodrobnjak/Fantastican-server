@@ -148,17 +148,18 @@ void Server::hookAddNewClient (std::shared_ptr<OneClient> client) {
     __hook(&OneClient::NewComeToChat, client.get(), &Server::addNewClient);
 }
 
-void Server::tryToConnect(OneClient& client,const std::string &name) {
-
+void Server::tryToConnect(OneClient& client, std::string &name) {
     for (auto c : clients) {
-        if (!std::strcmp(c->getName().c_str(), name.c_str())) {
-            std::string message = c->getName() + " da li zelite da se povezete sa " + name;
+       // std::cout << c->getName() << "[ " << name.compare(c->getName()+"\n") << " ]" << std::endl;
+        if (!name.compare(c->getName() + "\n")) {
+            std::string message = c->getName() + " da li zelite da se povezete sa " + client.getName();
             send(c->getSocket(), message.c_str(), (int)strlen(message.c_str()), 0);
+            break;
         }
     }
 }
 
-void Server::hookTryToConnect(std::shared_ptr<OneClient> client) {
-    __hook(&OneClient::tryToConnect, client.get(), &Server::tryToConnect);
+void Server::hookTryToConnect(std::shared_ptr<OneClient> &client) {
+    __hook(&OneClient::TryToConnect, client.get(), &Server::tryToConnect);
 }
 

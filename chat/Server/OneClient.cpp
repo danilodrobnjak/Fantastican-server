@@ -50,11 +50,15 @@ void OneClient::run() {
 
     iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
 
-    std::cout << name << " zeli da se poveze sa : " << recvbuf ;
+  //  std::cout << name << " zeli da se poveze sa : " << recvbuf ;
 
-    //pitaj ovog jel prihvata cet 
+    odgovor = recvbuf;
+   
+   
+    TryToConnect(*this,odgovor);
+
+
     ZeroMemory(recvbuf, sizeof(recvbuf));
-
 
     //posaljemo odg da li zeli
 
@@ -106,8 +110,6 @@ void OneClient::sendOnlineClients(std::string message) {
 
     send(ClientSocket, message.c_str(), (int)strlen(message.c_str()), 0);
 
-   // if (message != "Trenutno nema povezanih klijenata\n")
-    //    waitingOtherToConnenct = false;
 }
 
 

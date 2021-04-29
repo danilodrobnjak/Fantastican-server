@@ -22,8 +22,8 @@ public:
 
 	void addNewClient(OneClient &client);
 	void hookAddNewClient(std::shared_ptr<OneClient> client);
-	void tryToConnect(OneClient& client,const std::string &name);
-	void hookTryToConnect(std::shared_ptr<OneClient> client);
+	void tryToConnect(OneClient& client,std::string &name);
+	void hookTryToConnect(std::shared_ptr<OneClient> &client);
 
 private:
 	std::string name;

@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="OneClient.h" />
+    <ClInclude Include="Read.h" />
     <ClInclude Include="Server.h" />
   </ItemGroup>
   <ItemGroup>

@@ -1,2 +1,3 @@
-﻿  OneClient.cpp
+﻿  Server.cpp
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Server.cpp(83,9): warning C4101: 'iResult': unreferenced local variable
   Server.vcxproj -> C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Debug\Server.exe
