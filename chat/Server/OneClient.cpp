@@ -3,11 +3,21 @@
 
 
 OneClient::OneClient(SOCKET& ClientSocket)
-    :ClientSocket(ClientSocket) {
+    :m_ClientSocket(ClientSocket) {
 
-    waitingOtherToConnenct = true;
-    ZeroMemory(recvbuf, sizeof(recvbuf));
-    ZeroMemory(sendbuf, sizeof(sendbuf));
+    m_waitingOtherToConnenct = true;
+    ZeroMemory(m_recvbuf, m_recvbuflen);
+    ZeroMemory(m_sendbuf, m_sendbuflen);
+
+    m_read = std::make_shared<Read>(m_ClientSocket);
+    m_write = std::make_shared <Write>(m_ClientSocket);
+
+   // hookmessageToWrite(this);
+
+ //   std::thread citanje(&Read::run, m_read);
+  //  std::thread pisanje(&Write::run, m_write);
+
+
 }
 OneClient::~OneClient() {
 
@@ -19,132 +29,160 @@ OneClient::~OneClient() {
     //     WSACleanup();
     // }
 
-    closesocket(ClientSocket);
+    closesocket(m_ClientSocket);
     std::cout << "Klijent destr" << std::endl;
 }
 
 void OneClient::run() {
 
-    int iResult;
-    //char recvbuf[512];
-    //int recvbuflen = 512;
 
-    iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
-    name = recvbuf;
-    std::cout << "Client name " << name << std::endl;
-    ZeroMemory(recvbuf, sizeof(recvbuf));
+    //1st case
+    int iResult;
+
+    std::thread citanje(&Read::run, m_read);
+    std::thread pisanje(&Write::run, m_write);
+
+    hookMessageCome(m_read);
+    hookmessageToWrite(this);
+
+
+    while (m_case == 0);
+   // iResult = recv(m_ClientSocket, m_recvbuf, m_recvbuflen, 0);
+   // m_name = m_recvbuf;
+    //std::cout << "Client name" << m_name << std::endl;
+   // ZeroMemory(m_recvbuf, m_recvbuflen);
  
     NewComeToChat(*this);
-
-    while (waitingOtherToConnenct) {
-      //  NewComeToChat(*this);
-    }
-
+    while (m_waitingOtherToConnenct);
     NewComeToChat(*this);
 
-    std::string odgovor = "Odaberite s kim zelite da se dopisujete";
+    //2nd case
+    std::string odgovor = "Odaberite s kim zelite da se dopisujete\n";
 
-    iResult = send(ClientSocket, odgovor.c_str(), (int)strlen(odgovor.c_str()), 0);
+    //iResult = send(m_ClientSocket, odgovor.c_str(), (int)strlen(odgovor.c_str()), 0);
 
-    ZeroMemory(recvbuf, sizeof(recvbuf));
+    //ZeroMemory(m_recvbuf, m_recvbuflen);
 
-    iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+    MessageToWrite(odgovor);
 
-  //  std::cout << name << " zeli da se poveze sa : " << recvbuf ;
 
-    odgovor = recvbuf;
-   
-   
+    while (true);
+
+
+
+    iResult = recv(m_ClientSocket, m_recvbuf, m_recvbuflen, 0);
+
+
+   odgovor = m_recvbuf;
+     
     TryToConnect(*this,odgovor);
 
+    ZeroMemory(m_recvbuf, m_recvbuflen);
 
-    ZeroMemory(recvbuf, sizeof(recvbuf));
 
-    //posaljemo odg da li zeli
+    iResult = recv(m_ClientSocket, m_recvbuf, m_recvbuflen, 0);
+
+    std::cout << this->m_name << m_recvbuf;
+
+    odgovor = m_recvbuf;
+
+    if (!odgovor.compare("da\n"))
+        ResponseToConnect(*this,1);
+    else
+    {
+        ResponseToConnect(*this, -1);
+    }
+
+    ZeroMemory(m_recvbuf, m_recvbuflen);
+   //posaljemo odg da li zeli
 
    // odgovor = "Slaze se";
 
    // iResult = send(ClientSocket, odgovor.c_str(), (int)strlen(odgovor.c_str()), 0);
 
    // ZeroMemory(recvbuf, sizeof(recvbuf));
+   // std::thread citanje(&Read::run, m_read);
+   // std::thread pisanje(&Write::run, m_write);
+
+   // hookMessageCome(m_read);
 
 
+    //3rd case
     while (true) {
 
 
-        iResult = recv(ClientSocket, recvbuf, recvbuflen, 0);
+        iResult = recv(m_ClientSocket, m_recvbuf, m_recvbuflen, 0);
     
-        if (!strcmp(recvbuf, "cao\n"))
+        if (!strcmp(m_recvbuf, "cao\n"))
             break;
 
-        std::cout << recvbuf;
+        std::cout << m_recvbuf;
 
-        iResult = send(ClientSocket, recvbuf, (int)strlen(recvbuf), 0);
+        iResult = send(m_ClientSocket, m_recvbuf, (int)strlen(m_recvbuf), 0);
 
 
-        ZeroMemory(recvbuf, sizeof(recvbuf));
+        ZeroMemory(m_recvbuf, m_recvbuflen);
 
     }
-   // std::thread citanje(&read, this->ClientSocket);
-    //std::thread pisanje(&write, this->ClientSocket);
-    //pisanje.join();
-   // citanje.join();
+
+    citanje.join();
+    pisanje.join();
+
 
 }
 
 
 
 std::string OneClient::getName() {
-    return this->name;
+    return this->m_name;
 }
 
 SOCKET OneClient::getSocket() {
-    return this->ClientSocket;
+    return this->m_ClientSocket;
 }
 
 
 void OneClient::sendOnlineClients(std::string message) {
 
     if(message != "Trenutno nema povezanih klijenata\n")
-        waitingOtherToConnenct = false;
+        m_waitingOtherToConnenct = false;
 
-    send(ClientSocket, message.c_str(), (int)strlen(message.c_str()), 0);
+    send(m_ClientSocket, message.c_str(), (int)strlen(message.c_str()), 0);
 
 }
 
 
 bool operator!=(const OneClient &one,const OneClient &two) {
 
-    return one.ClientSocket != two.ClientSocket;
+    return one.m_ClientSocket != two.m_ClientSocket;
 
 }
 
 void OneClient::notAlone(){
-    waitingOtherToConnenct = false;
+    m_waitingOtherToConnenct = false;
     NewComeToChat(*this);
 }
 
 
-void OneClient::read(const SOCKET ConnectSocket) {
-
-    int iResult;
-    while (!end) {
-        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-        std::cout << recvbuf << std::endl;
-        ZeroMemory(recvbuf, sizeof(recvbuf));
-    }
-
+bool OneClient::getWaitingOtherToConnenct() {
+    return m_waitingOtherToConnenct;
 }
 
-void OneClient::write(const SOCKET ConnectSocket) {
-    while (getchar() != '\n');
-    int iResult;
-    while (!end) {
-
-        fgets(sendbuf, sendbuflen, stdin);
-        iResult = send(ConnectSocket, sendbuf, sendbuflen, 0);
-        if (!strcmp(sendbuf, "cao\n"))
-            end = true;
-        ZeroMemory(sendbuf, sizeof(sendbuf));
+void OneClient::messageCome(const std::string& message) {
+    std::cout << "Client send: " << message;
+    if (m_case == 0) {
+        m_name = message;
+        m_case = 1;
     }
+}
+
+void OneClient::hookMessageCome(std::shared_ptr<Read> read) {
+
+  
+    __hook(&Read::MessageCome,read.get(),&OneClient::messageCome);
+}
+
+void OneClient::hookmessageToWrite(OneClient* write) {
+
+    __hook(&OneClient::MessageToWrite, write, &Write::messageToWrite);
 }

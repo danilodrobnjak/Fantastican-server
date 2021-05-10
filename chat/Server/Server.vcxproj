@@ -86,7 +86,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
@@ -145,11 +145,14 @@
     <ClInclude Include="OneClient.h" />
     <ClInclude Include="Read.h" />
     <ClInclude Include="Server.h" />
+    <ClInclude Include="Write.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MainServer.cpp" />
     <ClCompile Include="OneClient.cpp" />
+    <ClCompile Include="Read.cpp" />
     <ClCompile Include="Server.cpp" />
+    <ClCompile Include="Write.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -4,10 +4,13 @@
 #define DEFAULT_BUFLEN 512
 
 Server::Server(std::string name, std::string port)
-    :name(name), port(port) {
+    :m_name(name), m_port(port) {
 
-    ListenSocket = INVALID_SOCKET;
-    clients = {};
+    m_ListenSocket = INVALID_SOCKET;
+    m_clients = {};
+    //m_niti = {};
+    m_connectedClients = {};
+    m_requestedConnections = {};
 
     initWSA();
 
@@ -26,42 +29,38 @@ Server::Server(std::string name, std::string port)
     if (iResult != 0) {
         printf("getaddrinfo failed with error: %d\n", iResult);
         WSACleanup();
-        //return 1;
     }
 
     // Create a SOCKET for connecting to server
-    ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (ListenSocket == INVALID_SOCKET) {
+    m_ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+    if (m_ListenSocket == INVALID_SOCKET) {
         printf("socket failed with error: %ld\n", WSAGetLastError());
         freeaddrinfo(result);
         WSACleanup();
-        // return 1;
     }
 
     // Setup the TCP listening socket
-    iResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+    iResult = bind(m_ListenSocket, result->ai_addr, (int)result->ai_addrlen);
     if (iResult == SOCKET_ERROR) {
         printf("bind failed with error: %d\n", WSAGetLastError());
         freeaddrinfo(result);
-        closesocket(ListenSocket);
+        closesocket(m_ListenSocket);
         WSACleanup();
-        // return 1;
     }
 
     freeaddrinfo(result);
 
-    iResult = listen(ListenSocket, SOMAXCONN);
+    iResult = listen(m_ListenSocket, SOMAXCONN);
     if (iResult == SOCKET_ERROR) {
         printf("listen failed with error: %d\n", WSAGetLastError());
-        closesocket(ListenSocket);
+        closesocket(m_ListenSocket);
         WSACleanup();
-        // return 1;
     }
 
 }
 
 Server::~Server() {
-    closesocket(ListenSocket);
+    closesocket(m_ListenSocket);
     WSACleanup();
 }
 
@@ -74,7 +73,6 @@ void Server::initWSA() {
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
         printf("WSAStartup failed with error: %d\n", iResult);
-        //return 1;
     }
 }
 
@@ -84,28 +82,29 @@ void Server::run() {
     SOCKET ClientSocket = INVALID_SOCKET;
     int i = 0;
 
-    std::vector<std::thread> niti = {};
+    std::vector<std::thread> m_niti = {};
 
     while (true) {
 
-        ClientSocket = accept(ListenSocket, NULL, NULL);
+        ClientSocket = accept(m_ListenSocket, NULL, NULL);
         if (ClientSocket == INVALID_SOCKET) {
             printf("accept failed with error: %d\n", WSAGetLastError());
-            closesocket(ListenSocket);
+            closesocket(m_ListenSocket);
             WSACleanup();
-            // return 1;
         }
 
         auto client = std::make_shared<OneClient>(ClientSocket);
 
-        niti.push_back(std::thread(&OneClient::run, client));
+        m_niti.push_back(std::thread(&OneClient::run, client));
 
-        clients.push_back(client);
+        m_clients.push_back(client);
 
-        hookAddNewClient(clients[i]);
+        hookAddNewClient(m_clients[i]);
 
-        hookTryToConnect(clients[i]);
+        hookTryToConnect(m_clients[i]);
    
+        hookResponseToConnect(m_clients[i]);
+
         i++;
 
     }
@@ -116,7 +115,7 @@ void Server::addNewClient(OneClient &client) {
 
     std::string allClients = "Trenutno povezani klijenti : ";
     bool alone = true;
-    for (auto c : clients) {
+    for (auto c : m_clients) {
         std::string name = c->getName();
         if ((name != "") && (*c != client)) {
             allClients += name;
@@ -132,12 +131,9 @@ void Server::addNewClient(OneClient &client) {
     }
     else {
         std::cout << allClients << std::endl;
-        //client.waitingOtherToConnenct = false;
         client.sendOnlineClients(allClients);
-        //client.waitingOtherToConnenct = false;
-        for (auto c : clients) {
-           if (c->waitingOtherToConnenct && c->getName() != "" && *c != client)
-               //c->waitingOtherToConnenct = false;
+        for (auto c : m_clients) {
+           if (c->getWaitingOtherToConnenct() && c->getName() != "" && *c != client)
                 c->notAlone();
         }
 
@@ -149,11 +145,11 @@ void Server::hookAddNewClient (std::shared_ptr<OneClient> client) {
 }
 
 void Server::tryToConnect(OneClient& client, std::string &name) {
-    for (auto c : clients) {
-       // std::cout << c->getName() << "[ " << name.compare(c->getName()+"\n") << " ]" << std::endl;
+    for (auto c : m_clients) {
         if (!name.compare(c->getName() + "\n")) {
             std::string message = c->getName() + " da li zelite da se povezete sa " + client.getName();
             send(c->getSocket(), message.c_str(), (int)strlen(message.c_str()), 0);
+            m_requestedConnections[c->getSocket()].push_back(std::make_pair(client.getSocket(), 0));
             break;
         }
     }
@@ -161,5 +157,34 @@ void Server::tryToConnect(OneClient& client, std::string &name) {
 
 void Server::hookTryToConnect(std::shared_ptr<OneClient> &client) {
     __hook(&OneClient::TryToConnect, client.get(), &Server::tryToConnect);
+}
+
+
+
+void Server::responseToConnect(OneClient& client, int value) {
+
+  
+    for (auto x : m_connectedClients) {
+        std::cout << x.first << "   " << x.second  <<std::endl;
+    }
+ 
+    auto elem = m_requestedConnections[client.getSocket()].begin()->first;
+
+    if (value == 1) {
+        std::string message = "Klijent " + client.getName() + " zeli da se poveze sa Vama";
+        send(elem, message.c_str(), (int)strlen(message.c_str()), 0);
+        this->m_connectedClients.push_back(std::make_pair(client.getSocket(),elem));
+        //requestedConnections[client.getName()].erase(requestedConnections[client.getSocket()].begin());
+    }
+    if (value == -1) {
+        std::string message = "Klijent " + client.getName() + "ne zeli da se poveze sa Vama";
+        send(elem, message.c_str(), (int)strlen(message.c_str()), 0);
+      //  requestedConnections[client.getName()].pop_back();
+    }
+
+}
+
+void Server::hookResponseToConnect(std::shared_ptr<OneClient> client) {
+    __hook(&OneClient::ResponseToConnect, client.get(), &Server::responseToConnect);
 }
 

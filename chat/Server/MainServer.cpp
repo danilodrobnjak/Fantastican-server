@@ -8,7 +8,7 @@
 int main(int argv, char** argc) {
 
 
-	Server server = Server(SERVER_NAME, DEFAULT_PORT);
+	Server server(SERVER_NAME, DEFAULT_PORT);
 
 	std::thread Serverska_nit(&Server::run, server);
 

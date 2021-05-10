@@ -7,6 +7,8 @@
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include "Read.h"
+#include "Write.h"
 
 #define DEFAULT_BUFLEN 512
 
@@ -20,30 +22,46 @@ public:
 	~OneClient();
 	void run();
 
-	bool waitingOtherToConnenct;
-
 	__event void NewComeToChat(OneClient &client);
 	__event void TryToConnect(OneClient &client,std::string &name);
+	__event void ResponseToConnect(OneClient& client,int value);
+	__event void MessageToWrite(const std::string& message);
+
+	void hookmessageToWrite(OneClient* write);
+
+
+	void messageCome(const std::string &message);
+	void hookMessageCome(std::shared_ptr<Read> read);
+
+
 
 	std::string getName();
 	SOCKET getSocket();
+	bool getWaitingOtherToConnenct();
 
 	void sendOnlineClients(std::string message);
 	void notAlone();
-	void read(const SOCKET ConnectSocket);
-	void write(const SOCKET ConnectSocket);
 
 	friend bool operator!=(const OneClient &one,const OneClient &two);
 
+	
+
+
 private:
 
-	std::string name;
-	SOCKET ClientSocket;
-	char sendbuf[DEFAULT_BUFLEN];
-	char recvbuf[DEFAULT_BUFLEN];
-	int recvbuflen = DEFAULT_BUFLEN;
-	int sendbuflen = DEFAULT_BUFLEN;
-	bool end = false;
+	std::string m_name;
+	SOCKET m_ClientSocket;
+	char m_sendbuf[DEFAULT_BUFLEN];
+	char m_recvbuf[DEFAULT_BUFLEN];
+	int m_recvbuflen = DEFAULT_BUFLEN;
+	int m_sendbuflen = DEFAULT_BUFLEN;
+	bool m_end = false;
+	bool m_waitingOtherToConnenct;
+	int m_case = 0;
+	
+    std::shared_ptr<Read> m_read;
+	std::shared_ptr<Write> m_write;
+
     
 	
 	
