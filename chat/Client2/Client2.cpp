@@ -156,13 +156,13 @@ int __cdecl main(int argc, char** argv)
 
     std::cout << "Sacekajte da proverimo ko je online .....\n";
 
-    while (true) {
-        ZeroMemory(recvbuf, sizeof(recvbuf));
-        iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-        if (strcmp(recvbuf, "Trenutno nema povezanih klijenata\n"))
-            break;
+    //while (true) {
+     //   ZeroMemory(recvbuf, sizeof(recvbuf));
+     //   iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+      //  if (strcmp(recvbuf, "Trenutno nema povezanih klijenata\n"))
+      //      break;
 
-    }
+    //}
 
 
     std::thread citanje(&read, ConnectSocket);

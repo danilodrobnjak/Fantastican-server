@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include<mutex>
 //#include "OneClient.h"
 #define _CRT_SECURE_NO_WARNINGS
 
@@ -28,4 +29,5 @@ private:
 	int m_iResult;
 	bool m_end;
 	bool m_newMessage=false;
+	std::mutex mtx;
 };

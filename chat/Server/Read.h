@@ -17,7 +17,7 @@ public:
 
 	void run();
 
-	__event void MessageCome(const std::string &message);
+	__event void MessageCome( std::string &message);
 
 private:
 	char m_recvbuf[DEFAULT_BUFLEN];

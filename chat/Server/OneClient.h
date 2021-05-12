@@ -7,12 +7,15 @@
 #include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include<mutex>
 #include "Read.h"
 #include "Write.h"
 
 #define DEFAULT_BUFLEN 512
 
 #pragma comment (lib, "Ws2_32.lib")
+
+
 
 
 class OneClient {
@@ -25,12 +28,12 @@ public:
 	__event void NewComeToChat(OneClient &client);
 	__event void TryToConnect(OneClient &client,std::string &name);
 	__event void ResponseToConnect(OneClient& client,int value);
-	__event void MessageToWrite(const std::string& message);
+	//__event void MessageToWrite(const std::string& message);
 
 	void hookmessageToWrite(OneClient* write);
 
 
-	void messageCome(const std::string &message);
+	void messageCome( std::string &message);
 	void hookMessageCome(std::shared_ptr<Read> read);
 
 
@@ -38,6 +41,9 @@ public:
 	std::string getName();
 	SOCKET getSocket();
 	bool getWaitingOtherToConnenct();
+	void setCase(int nCase) {
+		m_case = nCase;
+	}
 
 	void sendOnlineClients(std::string message);
 	void notAlone();
@@ -45,11 +51,12 @@ public:
 	friend bool operator!=(const OneClient &one,const OneClient &two);
 
 	
+	
 
 
 private:
 
-	std::string m_name;
+	std::string m_name ;
 	SOCKET m_ClientSocket;
 	char m_sendbuf[DEFAULT_BUFLEN];
 	char m_recvbuf[DEFAULT_BUFLEN];
@@ -58,6 +65,9 @@ private:
 	bool m_end = false;
 	bool m_waitingOtherToConnenct;
 	int m_case = 0;
+	bool m_flag = true;
+	//bool m_lock = false;
+	//std::mutex m_mutex;
 	
     std::shared_ptr<Read> m_read;
 	std::shared_ptr<Write> m_write;
