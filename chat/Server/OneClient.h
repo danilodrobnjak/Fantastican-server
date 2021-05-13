@@ -32,6 +32,7 @@ public:
 
 	void hookmessageToWrite(OneClient* write);
 
+	void sendMessageToClient(std::string &message);
 
 	void messageCome( std::string &message);
 	void hookMessageCome(std::shared_ptr<Read> read);

@@ -79,7 +79,7 @@ void OneClient::run() {
     
     //odgovor = m_recvbuf;
      
-    //TryToConnect(*this,odgovor);
+   // TryToConnect(*this,odgovor);
 
     //ZeroMemory(m_recvbuf, m_recvbuflen);
     while (true);
@@ -157,7 +157,14 @@ void OneClient::sendOnlineClients(std::string message) {
    // send(m_ClientSocket, message.c_str(), (int)strlen(message.c_str()), 0);
 
 }
+void OneClient::sendMessageToClient(std::string &message) {
 
+   
+    m_write->messageToWrite(message);
+   // m_case = 2;
+    // send(m_ClientSocket, message.c_str(), (int)strlen(message.c_str()), 0);
+    return;
+}
 
 bool operator!=(const OneClient &one,const OneClient &two) {
 
@@ -202,3 +209,5 @@ void OneClient::hookmessageToWrite(OneClient* write) {
     __hook(&OneClient::MessageToWrite, write, &Write::messageToWrite);
 }
 */
+
+

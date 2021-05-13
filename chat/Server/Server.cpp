@@ -96,7 +96,7 @@ void Server::run() {
         auto client = std::make_shared<OneClient>(ClientSocket);
 
         m_niti.push_back(std::thread(&OneClient::run, client));
-        m_requestedConnections.insert(std::make_pair(*((client.get())), std::vector<std::pair<OneClient, int>>()));
+        //m_requestedConnections.insert(std::make_pair(*((client.get())), std::vector<std::pair<OneClient, int>>()));
         m_clients.push_back(client);
 
         hookAddNewClient(m_clients[i]);
@@ -148,12 +148,16 @@ void Server::hookAddNewClient (std::shared_ptr<OneClient> client) {
 void Server::tryToConnect(OneClient &client, std::string &name) {
     for (auto c : m_clients) {
         if (!name.compare(c->getName() + "\n")) {
-            std::string message = c->getName() + " da li zelite da se povezete sa " + client.getName();          
-            send(c->getSocket(), message.c_str(), (int)strlen(message.c_str()), 0);
+            std::string message = c->getName() + " da li zelite da se povezete sa " + client.getName();
+            c->sendMessageToClient(message);
+            //send(c->getSocket(), message.c_str(), (int)strlen(message.c_str()), 0);
             //m_requestedConnections[c->getSocket()].push_back(std::make_pair(client.getSocket(), 0));
             //m_requestedConnections[(*(c.get()))].push_back(std::make_pair(client, 0));
             //m_requestedConnections.insert(std::make_pair((*(c.get())), std::vector<std::pair<OneClient, int>>()));
-            std::cout << (*(c.get())).getName() <<std::endl;
+            m_connectedClients.push_back(std::make_tuple(c,std::make_shared<OneClient>(client),0));
+            std::cout << (std::get<0>(m_connectedClients[0]))->getSocket()<<std::endl;
+            std::cout << (std::get<1>(m_connectedClients[0]))->getSocket() << std::endl;
+            std::cout << (std::get<2>(m_connectedClients[0])) << std::endl;
             break;
         }
     }
@@ -175,13 +179,31 @@ void Server::responseToConnect(OneClient& client, int value) {
 
    // auto elem = m_requestedConnections[client.getSocket()].begin()->first;
    // auto elem = m_requestedConnections[client].begin()->first;
-    if (value == 1) {
-        std::string message = "Klijent " + client.getName() + " zeli da se poveze sa Vama";
+
+    for (unsigned i = 0; i < m_connectedClients.size(); i++) {
+
+        if ((std::get<0>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
+            if (value == 1) {
+                std::string message = "Klijent " + client.getName() + " zeli da se poveze sa Vama";
+                std::get<1>(m_connectedClients[i])->sendMessageToClient(message);
+                std::get<2>(m_connectedClients[i]) = 1;
+                break;
+            }
+
+        }
+   }
+
+    std::cout << (std::get<0>(m_connectedClients[0]))->getSocket() << std::endl;
+    std::cout << (std::get<1>(m_connectedClients[0]))->getSocket() << std::endl;
+    std::cout << (std::get<2>(m_connectedClients[0])) << std::endl;
+    //if (value == 1) {
+      //  std::string message = "Klijent " + client.getName() + " zeli da se poveze sa Vama";
+        
        // send(elem.getSocket(), message.c_str(), (int)strlen(message.c_str()), 0);
        // this->m_connectedClients.push_back(std::make_pair(client,elem));
         //m_connectedClients.end()->first->setCase(3);
         //requestedConnections[client.getName()].erase(requestedConnections[client.getSocket()].begin());
-    }
+    //}
   //  if (value == -1) {
    //     std::string message = "Klijent " + client.getName() + "ne zeli da se poveze sa Vama";
    //     send(elem, message.c_str(), (int)strlen(message.c_str()), 0);
