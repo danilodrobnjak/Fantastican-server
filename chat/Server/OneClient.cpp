@@ -12,12 +12,6 @@ OneClient::OneClient(SOCKET& ClientSocket)
     m_read = std::make_shared<Read>(m_ClientSocket);
     m_write = std::make_shared <Write>(m_ClientSocket);
 
-   // hookmessageToWrite(this);
-
- //   std::thread citanje(&Read::run, m_read);
-  //  std::thread pisanje(&Write::run, m_write);
-
-
 }
 OneClient::~OneClient() {
 
@@ -36,98 +30,20 @@ OneClient::~OneClient() {
 void OneClient::run() {
 
 
-    //1st case
-    int iResult;
-
     std::thread citanje(&Read::run, m_read);
     std::thread pisanje(&Write::run, m_write);
 
     hookMessageCome(m_read);
-    //hookmessageToWrite(this);
-
 
     while (m_case == 0);
-   // iResult = recv(m_ClientSocket, m_recvbuf, m_recvbuflen, 0);
-   // m_name = m_recvbuf;
-    //std::cout << "Client name" << m_name << std::endl;
-   // ZeroMemory(m_recvbuf, m_recvbuflen);
- 
+  
     NewComeToChat(*this);
     while (m_waitingOtherToConnenct);
-    //NewComeToChat(*this);
 
-   // while (true);
-
-    //dobili informaciju ko je online.....
     while (m_case == 1);
-
-    //2nd case
-    std::string odgovor = "Odaberite s kim zelite da se dopisujete\n";
-
-    //iResult = send(m_ClientSocket, odgovor.c_str(), (int)strlen(odgovor.c_str()), 0);
-
-    //ZeroMemory(m_recvbuf, m_recvbuflen);
-
-    //MessageToWrite(odgovor);
-
-    
-    m_write->messageToWrite(odgovor);
+  
+    m_write->messageToWrite("Odaberite s kim zelite da se dopisujete\n");
    
-
-    //iResult = recv(m_ClientSocket, m_recvbuf, m_recvbuflen, 0);
-
-    
-    //odgovor = m_recvbuf;
-     
-   // TryToConnect(*this,odgovor);
-
-    //ZeroMemory(m_recvbuf, m_recvbuflen);
-    while (true);
-
-    //iResult = recv(m_ClientSocket, m_recvbuf, m_recvbuflen, 0);
-
-    //std::cout << this->m_name << m_recvbuf;
-
-    //odgovor = m_recvbuf;
-
-    if (!odgovor.compare("da\n"))
-        ResponseToConnect(*this,1);
-    else
-    {
-        ResponseToConnect(*this, -1);
-    }
-
-    ZeroMemory(m_recvbuf, m_recvbuflen);
-   //posaljemo odg da li zeli
-
-   // odgovor = "Slaze se";
-
-   // iResult = send(ClientSocket, odgovor.c_str(), (int)strlen(odgovor.c_str()), 0);
-
-   // ZeroMemory(recvbuf, sizeof(recvbuf));
-   // std::thread citanje(&Read::run, m_read);
-   // std::thread pisanje(&Write::run, m_write);
-
-   // hookMessageCome(m_read);
-
-
-    //3rd case
-    while (true) {
-
-
-        iResult = recv(m_ClientSocket, m_recvbuf, m_recvbuflen, 0);
-    
-        if (!strcmp(m_recvbuf, "cao\n"))
-            break;
-
-        std::cout << m_recvbuf;
-
-        iResult = send(m_ClientSocket, m_recvbuf, (int)strlen(m_recvbuf), 0);
-
-
-        ZeroMemory(m_recvbuf, m_recvbuflen);
-
-    }
 
     citanje.join();
     pisanje.join();
@@ -154,16 +70,11 @@ void OneClient::sendOnlineClients(std::string message) {
    
     m_write->messageToWrite(message);
     m_case = 2;
-   // send(m_ClientSocket, message.c_str(), (int)strlen(message.c_str()), 0);
-
 }
 void OneClient::sendMessageToClient(std::string &message) {
-
-   
+  
     m_write->messageToWrite(message);
-   // m_case = 2;
-    // send(m_ClientSocket, message.c_str(), (int)strlen(message.c_str()), 0);
-    return;
+   
 }
 
 bool operator!=(const OneClient &one,const OneClient &two) {
@@ -173,8 +84,6 @@ bool operator!=(const OneClient &one,const OneClient &two) {
 }
 
 void OneClient::notAlone(){
-   // m_waitingOtherToConnenct = false;
-    //std::cout << m_name << m_waitingOtherToConnenct<<std::endl;
     NewComeToChat(*this);
 }
 
@@ -184,17 +93,26 @@ bool OneClient::getWaitingOtherToConnenct() {
 }
 
 void OneClient::messageCome( std::string& message) {
-    std::cout << "Client send: " << message << std::endl;
+    std::cout << "Client send: " << message  << m_case<< std::endl;
+    
     if (m_case == 0) {
         m_name = message;
-        //std::cout << m_name;
         m_case = 1;
     }
-    else if (m_case == 2 && message.compare("da\n") != 0) {
-        TryToConnect(*this, message);
-    }
+   // else if (m_case == 2 && message.compare("da\n") != 0) {
+   //     TryToConnect(*this, message);
+   //     return;
+   // }
     else if (m_case == 2) {
-        ResponseToConnect(*this, 1);
+        if (message.compare("da\n") != 0) {
+            TryToConnect(*this, message);
+        }
+        else {
+            ResponseToConnect(*this, 1);
+        }
+    }
+    else if (m_case == 3) {
+        ChatMessage(*this, message);
     }
 }
 
@@ -203,11 +121,6 @@ void OneClient::hookMessageCome(std::shared_ptr<Read> read) {
   
     __hook(&Read::MessageCome,read.get(),&OneClient::messageCome);
 }
-/*
-void OneClient::hookmessageToWrite(OneClient* write) {
 
-    __hook(&OneClient::MessageToWrite, write, &Write::messageToWrite);
-}
-*/
 
 

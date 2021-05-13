@@ -28,9 +28,10 @@ public:
 	__event void NewComeToChat(OneClient &client);
 	__event void TryToConnect(OneClient &client,std::string &name);
 	__event void ResponseToConnect(OneClient& client,int value);
-	//__event void MessageToWrite(const std::string& message);
+	__event void ChatMessage(OneClient& client, std::string& name);
+	
 
-	void hookmessageToWrite(OneClient* write);
+	//void hookmessageToWrite(OneClient* write);
 
 	void sendMessageToClient(std::string &message);
 
@@ -67,8 +68,7 @@ private:
 	bool m_waitingOtherToConnenct;
 	int m_case = 0;
 	bool m_flag = true;
-	//bool m_lock = false;
-	//std::mutex m_mutex;
+	
 	
     std::shared_ptr<Read> m_read;
 	std::shared_ptr<Write> m_write;

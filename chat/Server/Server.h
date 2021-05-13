@@ -27,13 +27,10 @@ private:
 	std::string m_port;
 	SOCKET m_ListenSocket;
 	std::vector<std::shared_ptr<OneClient>> m_clients;
-	//std::map <SOCKET, std::vector<std::pair<SOCKET, int>> > m_requestedConnections;
-	//std::vector <std::pair<SOCKET, SOCKET>> m_connectedClients;
 	std::vector <std::tuple<std::shared_ptr<OneClient>, std::shared_ptr<OneClient>,int>> m_connectedClients;
 
 
-	//std::unordered_map <OneClient, std::vector<std::pair<OneClient, int>>> m_requestedConnections;
-	//::vector<std::thread> m_niti;
+
 
 	void initWSA();
 
@@ -43,5 +40,7 @@ private:
 	void hookTryToConnect(std::shared_ptr<OneClient>& client);
 	void responseToConnect(OneClient& client, int value);
 	void hookResponseToConnect(std::shared_ptr<OneClient> client);
+	void chatMessage(OneClient& client, std::string& message);
+	void hookChatMessage(std::shared_ptr<OneClient>& client);
 };
 
