@@ -16,8 +16,6 @@
 #pragma comment (lib, "Ws2_32.lib")
 
 
-
-
 class OneClient {
 
 public:
@@ -30,31 +28,17 @@ public:
 	__event void ResponseToConnect(OneClient& client,int value);
 	__event void ChatMessage(OneClient& client, std::string& name);
 	
-
-	//void hookmessageToWrite(OneClient* write);
-
-	void sendMessageToClient(std::string &message);
-
-	void messageCome( std::string &message);
-	void hookMessageCome(std::shared_ptr<Read> read);
-
-
-
 	std::string getName();
 	SOCKET getSocket();
 	bool getWaitingOtherToConnenct();
-	void setCase(int nCase) {
-		m_case = nCase;
-	}
-
+	void setCase(int nCase);
+	void sendMessageToClient(std::string &message);
+	void messageCome( std::string &message);
 	void sendOnlineClients(std::string message);
 	void notAlone();
-
 	friend bool operator!=(const OneClient &one,const OneClient &two);
 
 	
-	
-
 
 private:
 
@@ -67,14 +51,10 @@ private:
 	bool m_end = false;
 	bool m_waitingOtherToConnenct;
 	int m_case = 0;
-	bool m_flag = true;
-	
-	
     std::shared_ptr<Read> m_read;
 	std::shared_ptr<Write> m_write;
 
-    
-	
-	
+	void hookMessageCome(std::shared_ptr<Read> read);
+
 };
 

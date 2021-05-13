@@ -8,9 +8,7 @@ Server::Server(std::string name, std::string port)
 
     m_ListenSocket = INVALID_SOCKET;
     m_clients = {};
-    //m_niti = {};
     m_connectedClients = {};
-    //m_requestedConnections = {};
 
     initWSA();
 
@@ -78,7 +76,6 @@ void Server::initWSA() {
 
 void Server::run() {
 
-    int iResult;
     SOCKET ClientSocket = INVALID_SOCKET;
     int i = 0;
 
@@ -97,8 +94,10 @@ void Server::run() {
 
         m_niti.push_back(std::thread(&OneClient::run, client));
       
-        m_clients.push_back(client);
 
+       // m_clients_mutex.lock();
+        m_clients.push_back(client);
+       
         hookAddNewClient(m_clients[i]);
 
         hookTryToConnect(m_clients[i]);
@@ -106,7 +105,7 @@ void Server::run() {
         hookResponseToConnect(m_clients[i]);
 
         hookChatMessage(m_clients[i]);
-
+       // m_clients_mutex.unlock();
         i++;
 
     }
@@ -117,6 +116,7 @@ void Server::addNewClient(OneClient &client) {
 
     std::string allClients = "Trenutno povezani klijenti : ";
     bool alone = true;
+   // m_clients_mutex.lock();
     for (auto c : m_clients) {
         std::string name = c->getName();
         if ((name != "") && (*c != client)) {
@@ -125,7 +125,7 @@ void Server::addNewClient(OneClient &client) {
             alone = false;
         }
     }
-    allClients += "\n";
+    allClients += ".\n";
 
     if (alone) {
         //std::cout << "Trenutno nema povezanih klijenata" << std::endl;
@@ -140,6 +140,7 @@ void Server::addNewClient(OneClient &client) {
         }
 
     } 
+   // m_clients_mutex.unlock();
 }
 
 void Server::hookAddNewClient (std::shared_ptr<OneClient> client) {
@@ -147,34 +148,47 @@ void Server::hookAddNewClient (std::shared_ptr<OneClient> client) {
 }
 
 void Server::tryToConnect(OneClient &client, std::string &name) {
-   // for (auto c : m_clients) {
-   //     if (!name.compare(c->getName() + "\n")) {
-    //        std::string message = c->getName() + " da li zelite da se povezete sa " + client.getName();
-   //         c->sendMessageToClient(message);
-   //         m_connectedClients.push_back(std::make_tuple(c,std::make_shared<OneClient>(client),0));
-   //         std::cout << (std::get<0>(m_connectedClients[0]))->getSocket()<<std::endl;
-   //         std::cout << (std::get<1>(m_connectedClients[0]))->getSocket() << std::endl;
-   //         std::cout << (std::get<2>(m_connectedClients[0])) << std::endl;
-   //         break;
-   //     }
-  //  }
 
-    int prvi=0, drugi=0;
-
-    for (unsigned i = 0; i < m_clients.size();i++) {
-        if (!name.compare(m_clients[i]->getName() + "\n")) {
-            prvi = i;
-        }
-        else if (client.getSocket() == m_clients[i]->getSocket()) {
-            drugi = i;
-        }
+    int first=0, second=0;
+    std::string message;
+    if (!name.compare(client.getName() + "\n")) {
+        message = "Ne mozete se dopisivati sami sa sobom.\nOdaberite sa kim zelite da se dopisujete.\n";
+        client.sendMessageToClient(message);
     }
+    else {
+        bool find = false;
+       // m_connectedClients_mutex.lock();
+        for (auto c : m_connectedClients) {
+            if (std::get<0>(c)->getSocket() == client.getSocket()) {
+                find = true;
+                break;
+            }
+            else if (std::get<1>(c)->getSocket() == client.getSocket()) {
+                find = true;
+                break;
+            }
+        }
+        if(find) {
+            message = "Trazeni klijent je vec zatrazio vasu dozvolu za konekciju.\n";
+            client.sendMessageToClient(message);
+        }
+        else {
+            for (unsigned i = 0; i < m_clients.size();i++) {
+                if (!name.compare(m_clients[i]->getName() + "\n")) {
+                    first = i;
+                }
+                else if (client.getSocket() == m_clients[i]->getSocket()) {
+                    second = i;
+                }
+            }
 
-    std::string message = m_clients[prvi]->getName() + " da li zelite da se povezete sa " + client.getName();
+            message = m_clients[first]->getName() + " da li zelite da se povezete sa " + client.getName() + ".\n";
 
-    m_clients[prvi]->sendMessageToClient(message);
-    m_connectedClients.push_back(std::make_tuple(m_clients[prvi], m_clients[drugi], 0));
-
+            m_clients[first]->sendMessageToClient(message);
+            m_connectedClients.push_back(std::make_tuple(m_clients[first], m_clients[second], 0));
+        }
+       // m_connectedClients_mutex.unlock();
+    }
 
 }
 
@@ -188,35 +202,35 @@ void Server::hookChatMessage(std::shared_ptr<OneClient>& client) {
 
 
 void Server::chatMessage(OneClient& client, std::string& message) {
-
+   // m_connectedClients_mutex.lock();
     for (unsigned i = 0; i < m_connectedClients.size(); i++) {
 
         if ((std::get<0>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
             (std::get<1>(m_connectedClients[i]))->sendMessageToClient(message);
-            std::cout << "prvi " <<message << std::endl;
                 break;
         }
         else if ((std::get<1>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
             (std::get<0>(m_connectedClients[i]))->sendMessageToClient(message);
-            std::cout << "drugi "<< message << std::endl;
             break;
         }
 
 
     }
-
+  //  m_connectedClients_mutex.unlock();
 
 
 }
 
 void Server::responseToConnect(OneClient& client, int value) {
-
+    //m_connectedClients_mutex.lock();
     for (unsigned i = 0; i < m_connectedClients.size(); i++) {
 
         if ((std::get<0>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
             if (value == 1) {
-                std::string message = "Klijent " + client.getName() + " zeli da se poveze sa Vama";
+                //std::string message = "Klijent " + client.getName() + " zeli da se poveze sa Vama.\n";
+                std::string message = "Uspesno ste povezani. Mozete zapoceti dopisivanje.\n";
                 std::get<1>(m_connectedClients[i])->sendMessageToClient(message);
+                std::get<0>(m_connectedClients[i])->sendMessageToClient(message);
                 std::get<2>(m_connectedClients[i]) = 1;
                 std::get<0>(m_connectedClients[i])->setCase(3);
                 std::get<1>(m_connectedClients[i])->setCase(3);
@@ -225,11 +239,11 @@ void Server::responseToConnect(OneClient& client, int value) {
 
         }
    }
-    
+   // m_connectedClients_mutex.unlock();
 
-    std::cout << (std::get<0>(m_connectedClients[0]))->getSocket() << std::endl;
-    std::cout << (std::get<1>(m_connectedClients[0]))->getSocket() << std::endl;
-    std::cout << (std::get<2>(m_connectedClients[0])) << std::endl;
+   // std::cout << (std::get<0>(m_connectedClients[0]))->getSocket() << std::endl;
+    //std::cout << (std::get<1>(m_connectedClients[0]))->getSocket() << std::endl;
+    //std::cout << (std::get<2>(m_connectedClients[0])) << std::endl;
  
 }
 

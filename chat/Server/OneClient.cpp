@@ -61,13 +61,15 @@ SOCKET OneClient::getSocket() {
     return this->m_ClientSocket;
 }
 
+void OneClient::setCase(int nCase) {
+    m_case = nCase;
+}
+
 
 void OneClient::sendOnlineClients(std::string message) {
 
     if(message != "Trenutno nema povezanih klijenata\n")
         m_waitingOtherToConnenct = false;
-
-   
     m_write->messageToWrite(message);
     m_case = 2;
 }
@@ -99,10 +101,6 @@ void OneClient::messageCome( std::string& message) {
         m_name = message;
         m_case = 1;
     }
-   // else if (m_case == 2 && message.compare("da\n") != 0) {
-   //     TryToConnect(*this, message);
-   //     return;
-   // }
     else if (m_case == 2) {
         if (message.compare("da\n") != 0) {
             TryToConnect(*this, message);
@@ -117,8 +115,6 @@ void OneClient::messageCome( std::string& message) {
 }
 
 void OneClient::hookMessageCome(std::shared_ptr<Read> read) {
-
-  
     __hook(&Read::MessageCome,read.get(),&OneClient::messageCome);
 }
 

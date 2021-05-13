@@ -7,7 +7,6 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 #include<mutex>
-//#include "OneClient.h"
 #define _CRT_SECURE_NO_WARNINGS
 
 #pragma comment (lib, "Ws2_32.lib")
@@ -18,9 +17,8 @@ public:
 	Write(SOCKET& clientSocket);
 
 	void run();
-
 	void messageToWrite(const std::string& message);
-	//void hookmessageToWrite(OneClient* write);
+
 
 private:
 	char m_sendbuf[DEFAULT_BUFLEN];

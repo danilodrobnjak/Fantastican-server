@@ -15,7 +15,6 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-
 #define DEFAULT_BUFLEN 512
 #define DEFAULT_PORT "27015"
 
@@ -32,6 +31,7 @@ char recvbuf[DEFAULT_BUFLEN];
 int recvbuflen = DEFAULT_BUFLEN;
 int sendbuflen = DEFAULT_BUFLEN;
 bool end = false;
+char name[512];
 
 
 void read(const SOCKET ConnectSocket) {
@@ -39,17 +39,20 @@ void read(const SOCKET ConnectSocket) {
     int iResult;
     while (!end) {
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-        std::cout << recvbuf << std::endl;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN);
+        std::cout<<  recvbuf ;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
         ZeroMemory(recvbuf, sizeof(recvbuf));
     }
 
 }
 
 void write(const SOCKET ConnectSocket) {
-  //  while (getchar() != '\n');
+    // while (getchar() != '\n');
     int iResult;
-    while (!end) { 
-       // while (getchar() != '\n');
+    while (!end) {
+        // while (getchar() != '\n');
+        //std::cout << " [ " << name << " ] : ";
         fgets(sendbuf, sendbuflen, stdin);
         iResult = send(ConnectSocket, sendbuf, sendbuflen, 0);
         if (!strcmp(sendbuf, "cao\n"))
@@ -144,7 +147,7 @@ int __cdecl main(int argc, char** argv)
      //klijent prvo salje svoje ime da bi mogao da cetuje
     printf("Enter your name first : ");
 
-    char name[512];
+   // char name[512];
     ZeroMemory(name, sizeof(name));
     std::cin >> name;
 
@@ -156,13 +159,13 @@ int __cdecl main(int argc, char** argv)
 
     std::cout << "Sacekajte da proverimo ko je online .....\n";
 
-    //while (true) {
-     //   ZeroMemory(recvbuf, sizeof(recvbuf));
-     //   iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-      //  if (strcmp(recvbuf, "Trenutno nema povezanih klijenata\n"))
-      //      break;
+    //  while (true) {
+    //      ZeroMemory(recvbuf, sizeof(recvbuf));
+     //     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+    //      if (strcmp(recvbuf, "Trenutno nema povezanih klijenata\n"))
+     //         break;
 
-    //}
+     // }
 
 
     std::thread citanje(&read, ConnectSocket);

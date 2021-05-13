@@ -31,6 +31,7 @@ char recvbuf[DEFAULT_BUFLEN];
 int recvbuflen = DEFAULT_BUFLEN;
 int sendbuflen = DEFAULT_BUFLEN;
 bool end = false;
+char name[512];
 
 
 void read(const SOCKET ConnectSocket) {
@@ -38,21 +39,27 @@ void read(const SOCKET ConnectSocket) {
     int iResult;
     while (!end) {
         iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-        std::cout << recvbuf << std::endl;
+       
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_GREEN);
+        std::cout  << recvbuf ;
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+        
+      
         ZeroMemory(recvbuf, sizeof(recvbuf));
     }
 
 }
 
 void write(const SOCKET ConnectSocket) {
-   // while (getchar() != '\n');
+    // while (getchar() != '\n');
     int iResult;
     while (!end) {
-       // while (getchar() != '\n');
+        // while (getchar() != '\n');
+        //std::cout << " [ " << name << " ] : ";
         fgets(sendbuf, sendbuflen, stdin);
         iResult = send(ConnectSocket, sendbuf, sendbuflen, 0);
         if (!strcmp(sendbuf, "cao\n"))
-                  end = true;
+            end = true;
         ZeroMemory(sendbuf, sizeof(sendbuf));
     }
 }
@@ -72,11 +79,11 @@ int __cdecl main(int argc, char** argv)
     char recvbuf[DEFAULT_BUFLEN];
     int iResult;                       //br procitanih bajtova
     int recvbuflen = DEFAULT_BUFLEN;
-  //  int sendbuflen = DEFAULT_BUFLEN;
+    //  int sendbuflen = DEFAULT_BUFLEN;
 
 
 
-    // Initialize Winsock
+      // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
         printf("WSAStartup failed with error: %d\n", iResult);
@@ -124,7 +131,7 @@ int __cdecl main(int argc, char** argv)
     }
 
 
-   
+
 
     freeaddrinfo(result);
 
@@ -136,14 +143,14 @@ int __cdecl main(int argc, char** argv)
     }
 
 
-   // ZeroMemory(sendbuf, sizeof(sendbuf));
-   // ZeroMemory(recvbuf, sizeof(recvbuf));
+    // ZeroMemory(sendbuf, sizeof(sendbuf));
+    // ZeroMemory(recvbuf, sizeof(recvbuf));
 
 
-    //klijent prvo salje svoje ime da bi mogao da cetuje
+     //klijent prvo salje svoje ime da bi mogao da cetuje
     printf("Enter your name first : ");
 
-    char name[512];
+    // char name[512];
     ZeroMemory(name, sizeof(name));
     std::cin >> name;
 
@@ -151,17 +158,17 @@ int __cdecl main(int argc, char** argv)
 
     iResult = send(ConnectSocket, name, (int)strlen(name), 0);
 
-  //  iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+    //  iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
 
     std::cout << "Sacekajte da proverimo ko je online .....\n";
 
-  //  while (true) {
-  //      ZeroMemory(recvbuf, sizeof(recvbuf));
-   //     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-  //      if (strcmp(recvbuf, "Trenutno nema povezanih klijenata\n"))
-   //         break;
-       
-   // }
+    //  while (true) {
+    //      ZeroMemory(recvbuf, sizeof(recvbuf));
+     //     iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+    //      if (strcmp(recvbuf, "Trenutno nema povezanih klijenata\n"))
+     //         break;
+
+     // }
 
 
     std::thread citanje(&read, ConnectSocket);
@@ -183,9 +190,9 @@ int __cdecl main(int argc, char** argv)
    // std::cout << "Molimo sacekajte...." << std::endl;
 
    // ZeroMemory(recvbuf, sizeof(recvbuf));
-   
+
     //iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
-  
+
     ///std::cout << recvbuf;
 
     //std::cout << recvbuf << std::endl;
@@ -200,7 +207,7 @@ int __cdecl main(int argc, char** argv)
 
       //  fgets(sendbuf, sendbuflen, stdin);
 
-       
+
 
       //  iResult = send(ConnectSocket, sendbuf, (int)strlen(sendbuf), 0);
 

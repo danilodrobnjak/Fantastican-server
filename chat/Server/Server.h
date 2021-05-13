@@ -10,7 +10,8 @@
 #include <vector>
 #include <unordered_map>
 #include <tuple>
-// Need to link with Ws2_32.lib
+#include <mutex>
+
 #pragma comment (lib, "Ws2_32.lib")
 
 class Server  {
@@ -27,13 +28,11 @@ private:
 	std::string m_port;
 	SOCKET m_ListenSocket;
 	std::vector<std::shared_ptr<OneClient>> m_clients;
+	//std::mutex m_clients_mutex;
 	std::vector <std::tuple<std::shared_ptr<OneClient>, std::shared_ptr<OneClient>,int>> m_connectedClients;
-
-
-
+	//std::mutex m_connectedClients_mutex;
 
 	void initWSA();
-
 	void addNewClient(OneClient& client);
 	void hookAddNewClient(std::shared_ptr<OneClient> client);
 	void tryToConnect(OneClient &client, std::string& name);
