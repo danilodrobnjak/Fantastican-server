@@ -17,7 +17,7 @@
 class Server  {
 
 public:
-	Server(std::string name, std::string port);
+	Server(std::string name, std::string port,bool &initWsa);
 	~Server();
 	void run();
 
@@ -32,7 +32,7 @@ private:
 	std::vector <std::tuple<std::shared_ptr<OneClient>, std::shared_ptr<OneClient>,int>> m_connectedClients;
 	//std::mutex m_connectedClients_mutex;
 
-	void initWSA();
+	bool initWSA();
 	void addNewClient(OneClient& client);
 	void hookAddNewClient(std::shared_ptr<OneClient> client);
 	void tryToConnect(OneClient &client, std::string& name);
@@ -41,5 +41,9 @@ private:
 	void hookResponseToConnect(std::shared_ptr<OneClient> client);
 	void chatMessage(OneClient& client, std::string& message);
 	void hookChatMessage(std::shared_ptr<OneClient>& client);
+    void clientLeftTheChat(OneClient& client);
+	void hookClientLeftTheChat(std::shared_ptr<OneClient>& client);
+	void deleteClient(OneClient& client);
+	void hookDeleteClient(std::shared_ptr<OneClient>& client);
 };
 

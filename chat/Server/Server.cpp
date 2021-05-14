@@ -3,57 +3,62 @@
 
 #define DEFAULT_BUFLEN 512
 
-Server::Server(std::string name, std::string port)
+Server::Server(std::string name, std::string port, bool &initWsa)
     :m_name(name), m_port(port) {
 
     m_ListenSocket = INVALID_SOCKET;
     m_clients = {};
     m_connectedClients = {};
 
-    initWSA();
+    if (!initWSA())
+        initWsa = false;
+    else {
 
-    int iResult;
-    struct addrinfo* result = NULL;
-    struct addrinfo hints;
+        int iResult;
+        struct addrinfo* result = NULL;
+        struct addrinfo hints;
 
-    ZeroMemory(&hints, sizeof(hints));
-    hints.ai_family = AF_INET;            // The Internet Protocol version 4 (IPv4) address family.
-    hints.ai_socktype = SOCK_STREAM;      // Provides sequenced, reliable, two-way, connection-based byte streams with an OOB data transmission mechanism. (TCP)
-    hints.ai_protocol = IPPROTO_TCP;
-    hints.ai_flags = AI_PASSIVE;          //The socket address will be used in a call to the bindfunction.
+        ZeroMemory(&hints, sizeof(hints));
+        hints.ai_family = AF_INET;            // The Internet Protocol version 4 (IPv4) address family.
+        hints.ai_socktype = SOCK_STREAM;      // Provides sequenced, reliable, two-way, connection-based byte streams with an OOB data transmission mechanism. (TCP)
+        hints.ai_protocol = IPPROTO_TCP;
+        hints.ai_flags = AI_PASSIVE;          //The socket address will be used in a call to the bindfunction.
 
-    // Resolve the server address and port
-    iResult = getaddrinfo(NULL, port.c_str(), &hints, &result);
-    if (iResult != 0) {
-        printf("getaddrinfo failed with error: %d\n", iResult);
-        WSACleanup();
-    }
+        // Resolve the server address and port
+        iResult = getaddrinfo(NULL, port.c_str(), &hints, &result);
+        if (iResult != 0) {
+            printf("getaddrinfo failed with error: %d\n", iResult);
+            WSACleanup();
+        }
 
-    // Create a SOCKET for connecting to server
-    m_ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-    if (m_ListenSocket == INVALID_SOCKET) {
-        printf("socket failed with error: %ld\n", WSAGetLastError());
+        // Create a SOCKET for connecting to server
+        m_ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+        if (m_ListenSocket == INVALID_SOCKET) {
+            printf("socket failed with error: %ld\n", WSAGetLastError());
+            freeaddrinfo(result);
+            WSACleanup();
+        }
+
+        // Setup the TCP listening socket
+        iResult = bind(m_ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+        if (iResult == SOCKET_ERROR) {
+            printf("bind failed with error: %d\n", WSAGetLastError());
+            freeaddrinfo(result);
+            closesocket(m_ListenSocket);
+            WSACleanup();
+        }
+
         freeaddrinfo(result);
-        WSACleanup();
-    }
 
-    // Setup the TCP listening socket
-    iResult = bind(m_ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-    if (iResult == SOCKET_ERROR) {
-        printf("bind failed with error: %d\n", WSAGetLastError());
-        freeaddrinfo(result);
-        closesocket(m_ListenSocket);
-        WSACleanup();
+        iResult = listen(m_ListenSocket, SOMAXCONN);
+        if (iResult == SOCKET_ERROR) {
+            printf("listen failed with error: %d\n", WSAGetLastError());
+            closesocket(m_ListenSocket);
+            WSACleanup();
+        }
+        initWsa = true;
     }
-
-    freeaddrinfo(result);
-
-    iResult = listen(m_ListenSocket, SOMAXCONN);
-    if (iResult == SOCKET_ERROR) {
-        printf("listen failed with error: %d\n", WSAGetLastError());
-        closesocket(m_ListenSocket);
-        WSACleanup();
-    }
+    
 
 }
 
@@ -62,7 +67,7 @@ Server::~Server() {
     WSACleanup();
 }
 
-void Server::initWSA() {
+bool Server::initWSA() {
 
     WSADATA wsaData;
     int iResult;
@@ -70,8 +75,10 @@ void Server::initWSA() {
     // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (iResult != 0) {
-        printf("WSAStartup failed with error: %d\n", iResult);
+        return false;
     }
+
+    return true;
 }
 
 void Server::run() {
@@ -105,6 +112,10 @@ void Server::run() {
         hookResponseToConnect(m_clients[i]);
 
         hookChatMessage(m_clients[i]);
+
+        hookClientLeftTheChat(m_clients[i]);
+
+        hookDeleteClient(m_clients[i]);
        // m_clients_mutex.unlock();
         i++;
 
@@ -223,18 +234,26 @@ void Server::chatMessage(OneClient& client, std::string& message) {
 
 void Server::responseToConnect(OneClient& client, int value) {
     //m_connectedClients_mutex.lock();
+    std::string message;
     for (unsigned i = 0; i < m_connectedClients.size(); i++) {
 
         if ((std::get<0>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
             if (value == 1) {
                 //std::string message = "Klijent " + client.getName() + " zeli da se poveze sa Vama.\n";
-                std::string message = "Uspesno ste povezani. Mozete zapoceti dopisivanje.\n";
+                 message = "Uspesno ste povezani. Mozete zapoceti dopisivanje.\n";
                 std::get<1>(m_connectedClients[i])->sendMessageToClient(message);
                 std::get<0>(m_connectedClients[i])->sendMessageToClient(message);
                 std::get<2>(m_connectedClients[i]) = 1;
                 std::get<0>(m_connectedClients[i])->setCase(3);
                 std::get<1>(m_connectedClients[i])->setCase(3);
                 break;
+            }
+            else {
+                message = "Klijent je odbio vas zahtev za konekciju.\n";
+                std::get<1>(m_connectedClients[i])->sendMessageToClient(message);
+                std::get<1>(m_connectedClients[i])->setCase(1);
+                std::get<0>(m_connectedClients[i])->setCase(1);
+                m_connectedClients.erase(m_connectedClients.begin() + i);
             }
 
         }
@@ -251,3 +270,52 @@ void Server::hookResponseToConnect(std::shared_ptr<OneClient> client) {
     __hook(&OneClient::ResponseToConnect, client.get(), &Server::responseToConnect);
 }
 
+
+void  Server::clientLeftTheChat(OneClient& client) {
+
+    std::string message = client.getName() + " has left the chat\n";
+
+    for (unsigned i = 0; i < m_connectedClients.size(); i++) {
+
+        if ((std::get<0>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
+            (std::get<1>(m_connectedClients[i]))->sendMessageToClient(message);
+            std::get<0>(m_connectedClients[i])->setCase(1);
+            std::get<1>(m_connectedClients[i])->setCase(1);
+            m_connectedClients.erase(m_connectedClients.begin() + i);
+            break;
+        }
+        else if ((std::get<1>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
+            (std::get<0>(m_connectedClients[i]))->sendMessageToClient(message);
+            std::get<0>(m_connectedClients[i])->setCase(1);
+            std::get<1>(m_connectedClients[i])->setCase(1);
+            m_connectedClients.erase(m_connectedClients.begin() + i);
+            break;
+        }
+
+
+    }
+
+
+}
+void  Server::hookClientLeftTheChat(std::shared_ptr<OneClient>& client) {
+
+    __hook(&OneClient::ClientLeftTheChat, client.get(), &Server::clientLeftTheChat);
+}
+
+
+void Server::deleteClient(OneClient& client) {
+
+    for (unsigned i = 0; i < m_clients.size(); i++) {
+        if (m_clients[i]->getSocket() == client.getSocket()) {
+            m_clients.erase(m_clients.begin() + i);
+            break;
+        }
+    }
+
+}
+
+
+void Server::hookDeleteClient(std::shared_ptr<OneClient>& client) {
+    __hook(&OneClient::DeleteClient, client.get(), &Server::deleteClient);
+
+}
