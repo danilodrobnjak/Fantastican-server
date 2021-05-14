@@ -1,0 +1,15 @@
+﻿  MainServer.cpp
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\OneClient.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\MainServer.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+  OneClient.cpp
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\OneClient.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\OneClient.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+  Read.cpp
+  Server.cpp
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\OneClient.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\Server.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+  Write.cpp
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\Write.h(10,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\Write.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+  Generating Code...
+  Server.vcxproj -> C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\x64\Debug\Server.exe
