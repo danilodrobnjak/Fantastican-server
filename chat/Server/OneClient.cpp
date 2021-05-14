@@ -36,14 +36,16 @@ void OneClient::run() {
     hookMessageCome(m_read);
 
     while (m_case == 0);
-  
-    NewComeToChat(*this);
-    while (m_waitingOtherToConnenct);
 
-    while (m_case == 1);
-  
-    m_write->messageToWrite("Odaberite s kim zelite da se dopisujete\n");
-   
+    while (true) {
+        if (m_case == 1) {
+            NewComeToChat(*this);
+            while (m_waitingOtherToConnenct);
+            m_write->messageToWrite("Odaberite s kim zelite da se dopisujete\n");
+        }
+      
+    }
+ 
 
     citanje.join();
     pisanje.join();
@@ -97,21 +99,38 @@ bool OneClient::getWaitingOtherToConnenct() {
 void OneClient::messageCome( std::string& message) {
     std::cout << "Client send: " << message  << m_case<< std::endl;
     
-    if (m_case == 0) {
-        m_name = message;
-        m_case = 1;
-    }
-    else if (m_case == 2) {
-        if (message.compare("da\n") != 0) {
-            TryToConnect(*this, message);
+   // if (message.compare("q\n") == 0) {
+       // if(m_case == 2)
+        //ResponseToConnect(*this, -1);
+    //    if (m_case == 3)
+     //   ClientLeftTheChat(*this);
+     //   DeleteClient(*this);
+    //}
+    //else {
+        if (m_case == 0) {
+            m_name = message;
+            m_case = 1;
         }
-        else {
-            ResponseToConnect(*this, 1);
+        else if (m_case == 2) {
+            if (message.compare("da\n") != 0 && message.compare("ne\n") != 0) {
+                TryToConnect(*this, message);
+            }
+            else if (message.compare("da\n") == 0){
+                ResponseToConnect(*this, 1);
+            }
+            else if (message.compare("ne\n") == 0) {
+                ResponseToConnect(*this, -1);
+            }
         }
-    }
-    else if (m_case == 3) {
-        ChatMessage(*this, message);
-    }
+        else if (m_case == 3) {
+            if (message.compare("cao\n") == 0)
+                ClientLeftTheChat(*this);
+            else {
+                ChatMessage(*this, message);
+            }
+        }
+    //}
+   
 }
 
 void OneClient::hookMessageCome(std::shared_ptr<Read> read) {

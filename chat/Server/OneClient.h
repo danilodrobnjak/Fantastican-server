@@ -27,6 +27,8 @@ public:
 	__event void TryToConnect(OneClient &client,std::string &name);
 	__event void ResponseToConnect(OneClient& client,int value);
 	__event void ChatMessage(OneClient& client, std::string& name);
+	__event void ClientLeftTheChat(OneClient& client);
+	__event void DeleteClient(OneClient& client);
 	
 	std::string getName();
 	SOCKET getSocket();

@@ -58,7 +58,7 @@ void write(const SOCKET ConnectSocket) {
         //std::cout << " [ " << name << " ] : ";
         fgets(sendbuf, sendbuflen, stdin);
         iResult = send(ConnectSocket, sendbuf, sendbuflen, 0);
-        if (!strcmp(sendbuf, "cao\n"))
+        if (!strcmp(sendbuf, "q\n"))
             end = true;
         ZeroMemory(sendbuf, sizeof(sendbuf));
     }
