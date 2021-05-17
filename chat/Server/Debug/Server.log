@@ -2,13 +2,13 @@
   OneClient.cpp
   Read.cpp
   Server.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file OneClient.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file Server.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Server.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file MainServer.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\MainServer.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file OneClient.cpp)
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file Server.cpp)
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\chat\Server\Server.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file MainServer.cpp)
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\chat\Server\MainServer.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
   Write.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Write.h(10,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file Write.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Write.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-  Server.vcxproj -> C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Debug\Server.exe
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\chat\Server\Write.h(10,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file Write.cpp)
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\chat\Server\Write.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+  Server.vcxproj -> C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\chat\Server\Debug\Server.exe

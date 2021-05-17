@@ -1,7 +1,7 @@
 #include "Client.h"
 
 
-Client::Client(bool error, std::string errorMessage){
+Client::Client(){
 
     ZeroMemory(name, sizeof(name));
     
@@ -12,10 +12,7 @@ Client::Client(bool error, std::string errorMessage){
 
       // Initialize Winsock
     iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (iResult != 0) {
-        error = true;
-        errorMessage = "WSAStartup failed with error: " + iResult;
-    }
+    if (iResult != 0) throw E_WSAStartup();
 
     ZeroMemory(&hints, sizeof(hints));
     hints.ai_family = AF_UNSPEC;
@@ -26,8 +23,7 @@ Client::Client(bool error, std::string errorMessage){
     iResult = getaddrinfo("localhost", DEFAULT_PORT, &hints, &result);
     if (iResult != 0) {
         WSACleanup();
-        error = true;
-        errorMessage = "getaddrinfo failed with error: " + iResult;
+        throw E_ADDR_INFO();
        
     }
 
@@ -38,8 +34,7 @@ Client::Client(bool error, std::string errorMessage){
             ptr->ai_protocol);
         if (ConnectSocket == INVALID_SOCKET) {
             WSACleanup();
-            error = true;
-            errorMessage = "socket failed with error: " + iResult;
+            throw E_Socket();
            
         }
 
@@ -59,13 +54,13 @@ Client::Client(bool error, std::string errorMessage){
     // ako na kraju svih mogucih ip adresa za taj "localhost" ovo ostane prazno prekidamo jer nismo uspeli da se povezemo
     if (ConnectSocket == INVALID_SOCKET) {
         WSACleanup();
-        error = true;
-        errorMessage = "Unable to connect to server!\n";
+        throw E_Server();
 
     }
 
 
 }
+
 
 
 Client::~Client(){
