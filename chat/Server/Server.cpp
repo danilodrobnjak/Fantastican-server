@@ -248,12 +248,22 @@ void Server::responseToConnect(OneClient& client, int value) {
                 std::get<1>(m_connectedClients[i])->setCase(3);
                 break;
             }
-            else {
+            else if(value==-1) {
                 message = "Klijent je odbio vas zahtev za konekciju.\n";
                 std::get<1>(m_connectedClients[i])->sendMessageToClient(message);
                 std::get<1>(m_connectedClients[i])->setCase(1);
                 std::get<0>(m_connectedClients[i])->setCase(1);
                 m_connectedClients.erase(m_connectedClients.begin() + i);
+                break;
+            }
+            else if (value == -2) {
+                message = "Klijent se diskonektovao sa servera!\n";
+                std::get<1>(m_connectedClients[i])->sendMessageToClient(message);
+                std::get<1>(m_connectedClients[i])->setCase(1);
+                //std::get<0>(m_connectedClients[i])->setCase(0);
+                //std::get<1>(m_connectedClients[i])->sendMessageToClient(std::get<0>(m_connectedClients[i])->getName());
+                m_connectedClients.erase(m_connectedClients.begin() + i);
+                break;
             }
 
         }

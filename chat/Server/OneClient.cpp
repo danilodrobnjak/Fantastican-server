@@ -38,11 +38,16 @@ void OneClient::run() {
     while (m_case == 0);
 
     while (true) {
-        if (m_case == 1) {
-            NewComeToChat(*this);
-            while (m_waitingOtherToConnenct);
-            m_write->messageToWrite("Odaberite s kim zelite da se dopisujete\n");
-        }
+    
+        NewComeToChat(*this);
+        while (m_waitingOtherToConnenct);
+        
+
+        while (m_case == 1);
+        m_write->messageToWrite("Odaberite s kim zelite da se dopisujete\n");
+
+
+        while (m_case == 2 || m_case == 3);
       
     }
  
@@ -74,6 +79,7 @@ void OneClient::sendOnlineClients(std::string message) {
         m_waitingOtherToConnenct = false;
     m_write->messageToWrite(message);
     m_case = 2;
+    //m_write->messageToWrite("Odaberite s kim zelite da se dopisujete\n");
 }
 void OneClient::sendMessageToClient(std::string &message) {
   
@@ -99,14 +105,17 @@ bool OneClient::getWaitingOtherToConnenct() {
 void OneClient::messageCome( std::string& message) {
     std::cout << "Client send: " << message  << m_case<< std::endl;
     
-   // if (message.compare("q\n") == 0) {
-       // if(m_case == 2)
-        //ResponseToConnect(*this, -1);
-    //    if (m_case == 3)
-     //   ClientLeftTheChat(*this);
-     //   DeleteClient(*this);
-    //}
-    //else {
+    if (message.compare("q\n") == 0) {
+  
+        if(m_case == 2)
+            ResponseToConnect(*this, -2);
+        if(m_case == 3)
+            ClientLeftTheChat(*this);
+
+        DeleteClient(*this);
+        return;
+    }
+    else {
         if (m_case == 0) {
             m_name = message;
             m_case = 1;
@@ -129,7 +138,7 @@ void OneClient::messageCome( std::string& message) {
                 ChatMessage(*this, message);
             }
         }
-    //}
+    }
    
 }
 
