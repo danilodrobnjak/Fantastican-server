@@ -10,6 +10,9 @@
 #include<mutex>
 #include "Read.h"
 #include "Write.h"
+#include "State.h"
+#include "NotInChat.h"
+#include "ClientRegistration.h"
 
 #define DEFAULT_BUFLEN 512
 
@@ -31,8 +34,18 @@ public:
 	__event void DeleteClient(OneClient& client);
 	
 	std::string getName();
-	SOCKET getSocket();
+	SOCKET& getSocket();
 	bool getWaitingOtherToConnenct();
+	void setWaitingOtherToConnenct(bool waitingOtherToConnenct) {
+		m_waitingOtherToConnenct = waitingOtherToConnenct;
+	}
+	State* getState() {
+		return m_state;
+	}
+
+	void setState(State * state){
+		m_state = state;
+	};
 	void setCase(int nCase);
 	void sendMessageToClient(std::string &message);
 	void messageCome( std::string &message);
@@ -40,7 +53,7 @@ public:
 	void notAlone();
 	friend bool operator!=(const OneClient &one,const OneClient &two);
 
-	
+	//State* m_state;
 
 private:
 
@@ -55,6 +68,9 @@ private:
 	int m_case = 0;
     std::shared_ptr<Read> m_read;
 	std::shared_ptr<Write> m_write;
+
+	//state of object
+	State* m_state;
 
 	void hookMessageCome(std::shared_ptr<Read> read);
 

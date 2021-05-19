@@ -13,8 +13,9 @@ int main(int argv, char** argc) {
 
 	if (initWSA) {
 		std::thread Serverska_nit(&Server::run, server);
-
+		std::thread Serverska_nit2(&Server::addNewClient2, server);
 		Serverska_nit.join();
+		Serverska_nit2.join();
 	}
 	else {
 		std::cout <<"WSAStartup failed " << std::endl;

@@ -12,6 +12,7 @@ OneClient::OneClient(SOCKET& ClientSocket)
     m_read = std::make_shared<Read>(m_ClientSocket);
     m_write = std::make_shared <Write>(m_ClientSocket);
 
+    m_state = new ClientRegistration(m_ClientSocket,&m_name);
 }
 OneClient::~OneClient() {
 
@@ -36,6 +37,7 @@ void OneClient::run() {
     hookMessageCome(m_read);
 
     while (m_case == 0);
+   
 
     while (true) {
     
@@ -44,7 +46,7 @@ void OneClient::run() {
         
 
         while (m_case == 1);
-        m_write->messageToWrite("Odaberite s kim zelite da se dopisujete\n");
+      //  m_write->messageToWrite("Odaberite s kim zelite da se dopisujete\n");
 
 
         while (m_case == 2 || m_case == 3);
@@ -64,7 +66,7 @@ std::string OneClient::getName() {
     return this->m_name;
 }
 
-SOCKET OneClient::getSocket() {
+SOCKET& OneClient::getSocket() {
     return this->m_ClientSocket;
 }
 
@@ -75,8 +77,8 @@ void OneClient::setCase(int nCase) {
 
 void OneClient::sendOnlineClients(std::string message) {
 
-    if(message != "Trenutno nema povezanih klijenata\n")
-        m_waitingOtherToConnenct = false;
+   // if(message != "Trenutno nema povezanih klijenata\n")
+   //     m_waitingOtherToConnenct = false;
     m_write->messageToWrite(message);
     m_case = 2;
     //m_write->messageToWrite("Odaberite s kim zelite da se dopisujete\n");
@@ -94,7 +96,7 @@ bool operator!=(const OneClient &one,const OneClient &two) {
 }
 
 void OneClient::notAlone(){
-    NewComeToChat(*this);
+   //NewComeToChat(*this);
 }
 
 
@@ -103,8 +105,11 @@ bool OneClient::getWaitingOtherToConnenct() {
 }
 
 void OneClient::messageCome( std::string& message) {
-    std::cout << "Client send: " << message  << m_case<< std::endl;
+  //  std::cout << "Client send: " << message  << m_case<< std::endl;
     
+    m_state->messageCome(m_ClientSocket,message);
+    m_state = m_state->nextState(); 
+
     if (message.compare("q\n") == 0) {
   
         if(m_case == 2)
@@ -117,7 +122,7 @@ void OneClient::messageCome( std::string& message) {
     }
     else {
         if (m_case == 0) {
-            m_name = message;
+        //    m_name = message;
             m_case = 1;
         }
         else if (m_case == 2) {

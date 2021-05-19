@@ -142,16 +142,29 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ClientInChat.h" />
+    <ClInclude Include="ClientRegistration.h" />
+    <ClInclude Include="HaveRequestForConnection.h" />
+    <ClInclude Include="Locks.h" />
+    <ClInclude Include="NotConnected.h" />
+    <ClInclude Include="NotInChat.h" />
     <ClInclude Include="OneClient.h" />
     <ClInclude Include="Read.h" />
     <ClInclude Include="Server.h" />
+    <ClInclude Include="State.h" />
+    <ClInclude Include="WaitForResponseToConnect.h" />
     <ClInclude Include="Write.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ClientInChat.cpp" />
+    <ClCompile Include="ClientRegistration.cpp" />
+    <ClCompile Include="HaveRequestForConnection.cpp" />
     <ClCompile Include="MainServer.cpp" />
+    <ClCompile Include="NotConnected.cpp" />
     <ClCompile Include="OneClient.cpp" />
     <ClCompile Include="Read.cpp" />
     <ClCompile Include="Server.cpp" />
+    <ClCompile Include="WaitForResponseToConnect.cpp" />
     <ClCompile Include="Write.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

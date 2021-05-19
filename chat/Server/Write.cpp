@@ -19,8 +19,8 @@ void Write::run() {
         }
             mtx.lock();
             m_iResult = send(m_clientSocket, m_sendbuf, m_sendbuflen, 0);
-            std::cout << m_iResult;
-            std::cout << m_sendbuf << std::endl;
+            //std::cout << m_iResult;
+           // std::cout << m_sendbuf << std::endl;
             m_newMessage = false;
             if (!strcmp(m_sendbuf, "cao\n"))
                 m_end = true;
