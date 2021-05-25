@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _READ_H
+#define _READ_H
 #define WIN32_LEAN_AND_MEAN
 #define DEFAULT_BUFLEN 512
 #include <iostream>
@@ -26,3 +28,4 @@ private:
 	int m_iResult;
 	bool m_end;
 };
+#endif

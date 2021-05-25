@@ -1,19 +1,14 @@
-﻿  ClientInChat.cpp
-  ClientRegistration.cpp
-  HaveRequestForConnection.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\ClientInChat.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file ClientInChat.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\ClientInChat.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\ClientRegistration.h(4,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file ClientRegistration.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\ClientRegistration.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-  NotConnected.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\State.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file HaveRequestForConnection.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\HaveRequestForConnection.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\NotConnected.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file NotConnected.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\NotConnected.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\HaveRequestForConnection.h(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file HaveRequestForConnection.cpp)
+﻿  MainServer.cpp
+  OneClient.cpp
   Server.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.h(3,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file Server.cpp)
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file OneClient.cpp)
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file Server.cpp)
 C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Server.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\HaveRequestForConnection.h(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file Server.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Server.cpp(4,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\OneClient.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file MainServer.cpp)
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\MainServer.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\HaveRequestForConnection.h(6,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file MainServer.cpp)
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Server.h(17,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file MainServer.cpp)
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\HaveRequestForConnection.h(6,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file Server.cpp)
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Server.h(17,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file Server.cpp)
   Server.vcxproj -> C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Debug\Server.exe

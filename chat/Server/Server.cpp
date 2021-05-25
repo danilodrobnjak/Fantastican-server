@@ -1,10 +1,5 @@
 #include "Server.h"
-#include "OneClient.h"
-#include "HaveRequestForConnection.h"
-#include "NotConnected.h";
-#include "ClientInChat.h"
 
-#define DEFAULT_BUFLEN 512
 
 Server::Server(std::string name, std::string port, bool &initWsa)
     :m_name(name), m_port(port) {
@@ -87,11 +82,9 @@ bool Server::initWSA() {
 void Server::run() {
 
     SOCKET ClientSocket = INVALID_SOCKET;
-    int i = 0;
-
+ 
     std::vector<std::thread> m_niti = {};
 
-  
 
     while (true) {
 
@@ -102,263 +95,287 @@ void Server::run() {
             WSACleanup();
         }
 
-        auto client = std::make_shared<OneClient>(ClientSocket);
-
+        auto client = std::make_shared<OneClient>(ClientSocket,socketToProcess);
         m_niti.push_back(std::thread(&OneClient::run, client));
-      
-
-       // m_clients_mutex.lock();
-        m_clients.push_back(client);
        
-        hookAddNewClient(m_clients[i]);
-
-        hookTryToConnect(m_clients[i]);
-   
-        hookResponseToConnect(m_clients[i]);
-
-        hookChatMessage(m_clients[i]);
-
-        hookClientLeftTheChat(m_clients[i]);
-
-        hookDeleteClient(m_clients[i]);
-       // m_clients_mutex.unlock();
-        i++;
+        m_clients.push_back(client);
 
     }
 
 }
 
-void Server::addNewClient(OneClient &client) {
+void Server::addNewClient() {
+   
+    while (true) {
 
-    std::string allClients = "Trenutno povezani klijenti : ";
-    bool alone = true;
-    for (auto c : m_clients) {
-        std::string name = c->getName();
-        if ((name != "") && (*c != client)) {
-            allClients += name;
-            allClients += "  ";
-            alone = false;
-        }
-    }
-    allClients += ".\n";
-    if (!alone) {
-        client.sendOnlineClients(allClients);
-        client.setWaitingOtherToConnenct(false);
-        for (auto c : m_clients) {
-            if (!c->getState()->isInChat() && *c != client) {
-                std::string newClientCome = client.getName() + " se pridruzio.\n";
-                c->sendMessageToClient(newClientCome);
+        std::unique_lock<std::mutex> ul(socketToProcess.get()->m_socketToProcess_mutex);
+        auto x = socketToProcess;
+        (socketToProcess.get()->m_socketToProcess_cv).wait(ul, [x]() { return x.get()->m_socketToProcess_ready;});
+
+        if ((*socketToProcess.get()).m_socketToProcess != INVALID_SOCKET) {
+            std::cout << (*socketToProcess.get()).m_socketToProcess << std::endl;
+
+            std::shared_ptr<OneClient> client = nullptr;
+            for (auto c : m_clients) {
+                if (c->getSocket() == socketToProcess->m_socketToProcess) {
+                    client = c;
+                    break;
+                }
             }
-            c->setWaitingOtherToConnenct(false);
+            //odavde pocinje kopirani deo
+            std::string allClients = "Trenutno povezani klijenti : ";
+            bool alone = true;
+            for (auto c : m_clients) {
+                std::string name = c->getName();
+                if ((name != "") && (c != client)) {
+                    allClients += name;
+                    allClients += "  ";
+                    alone = false;
+                }
+            }
+            allClients += ".\n";
+            if (!alone) {
+                client->sendMessageToClient(allClients);
+                for (auto c : m_clients) {
+                    if (!c->getState()->isInChat() && c != client) {
+                        std::string newClientCome = client->getName() + " se pridruzio.\n";
+                        c->sendMessageToClient(newClientCome);
+                    }
+                }
+            }
+            else {
+                allClients = "Trenutno nema drugih povezanih klijenata.\n";
+                client->sendMessageToClient(allClients);
+            }
+
+        }
+
+        socketToProcess.get()->m_socketToProcess_ready = false;
+
+        ul.unlock();
+
+    }
+}
+
+
+void Server::tryToConnect() {
+    while(true){
+    std::unique_lock<std::mutex> ul(socketToProcess.get()->m_nameToProcess_mutex);
+    auto x = socketToProcess;
+    (socketToProcess.get()->m_nameToProcess_cv).wait(ul, [x]() { return x.get()->m_nameToProcess_ready;});
+
+    std::shared_ptr<OneClient> client = nullptr;
+    for (auto c : m_clients) {
+        if (c->getSocket() == socketToProcess->m_nameSocketToProcess) {
+            client = c;
+            break;
         }
     }
-    else {
-        allClients = "Trenutno nema drugih povezanih klijenata.\n";
-        client.sendOnlineClients(allClients);
-    }
 
-}
+    std::string name = socketToProcess.get()->m_nameToProcess;
 
-
-void Server::addNewClient2() {
-
-    while (true) {  
-        //ceka da neko zatrazi listu 
-        //uzme soket iz prom deljene iz loka
-        //nadje klijenta ciji je to soket
-        //prekucam prethodnu funkciju
-        //pustim da neko drugi zatrazi
-   
-    }
-}
-
-void Server::hookAddNewClient (std::shared_ptr<OneClient> client) {
-    __hook(&OneClient::NewComeToChat, client.get(), &Server::addNewClient);
-}
-
-//void Server::hookAddNewClient(std::shared_ptr<OneClient> client) {
- //   __hook(&State::NewComeToChat, client.get()->getState(), &Server::addNewClient2);
-//}
-
-void Server::tryToConnect(OneClient &client, std::string &name) {
-
-    int first=0, second=0;
+    //kopija prethodne implementacije funkcije
+    int first = 0, second = 0;
     std::string message;
-    if (!name.compare(client.getName() + "\n")) {
+    if (!name.compare(client->getName() + "\n")) {
         message = "Ne mozete se dopisivati sami sa sobom.\nOdaberite sa kim zelite da se dopisujete.\n";
-        client.sendMessageToClient(message);
+        client->sendMessageToClient(message);
     }
     else {
         bool find = false;
-       // m_connectedClients_mutex.lock();
+        // m_connectedClients_mutex.lock();
         for (auto c : m_connectedClients) {
-            if (std::get<0>(c)->getSocket() == client.getSocket()) {
+            if (c.first->getSocket() == client->getSocket()) {
                 find = true;
                 break;
             }
-            else if (std::get<1>(c)->getSocket() == client.getSocket()) {
+            else if (c.second->getSocket() == client->getSocket()) {
                 find = true;
                 break;
             }
         }
-        if(find) {
+        if (find) {
             message = "Trazeni klijent je vec zatrazio vasu dozvolu za konekciju.\n";
-            client.sendMessageToClient(message);
+            client->sendMessageToClient(message);
         }
         else {
             for (unsigned i = 0; i < m_clients.size();i++) {
                 if (!name.compare(m_clients[i]->getName() + "\n")) {
                     first = i;
                 }
-                else if (client.getSocket() == m_clients[i]->getSocket()) {
+                else if (client->getSocket() == m_clients[i]->getSocket()) {
                     second = i;
                 }
             }
             if (m_clients[first]->getState()->isInChat()) {
                 message = "Klijent je trenutno zauzet pokusajte kasnije.\n";
-                client.sendMessageToClient(message);
-                client.setState( new NotConnected(client.getSocket()));
+                client->sendMessageToClient(message);
+                client->setState(new NotConnected(client->getSocket(), socketToProcess));
             }
             else {
-                message = m_clients[first]->getName() + " da li zelite da se povezete sa " + client.getName() + ".\n";
+                message = m_clients[first]->getName() + " da li zelite da se povezete sa " + client->getName() + ".\n";
 
                 m_clients[first]->sendMessageToClient(message);
-                m_clients[first]->setState(new HaveRequestForConnection(client.getSocket()));
-                m_connectedClients.push_back(std::make_tuple(m_clients[first], m_clients[second]));
+                m_clients[first]->setState(new HaveRequestForConnection(client->getSocket(), socketToProcess));
+                m_connectedClients.push_back(std::make_pair(m_clients[first], m_clients[second]));
             }
         }
-       // m_connectedClients_mutex.unlock();
+        // m_connectedClients_mutex.unlock();
     }
 
-}
 
-void Server::hookTryToConnect(std::shared_ptr<OneClient> &client) {
-    __hook(&OneClient::TryToConnect, client.get(), &Server::tryToConnect);
+    socketToProcess.get()->m_nameToProcess_ready = false;
+    ul.unlock();
 }
-
-void Server::hookChatMessage(std::shared_ptr<OneClient>& client) {
-    __hook(&OneClient::ChatMessage, client.get(), &Server::chatMessage);
 }
 
 
-void Server::chatMessage(OneClient& client, std::string& message) {
-   // m_connectedClients_mutex.lock();
-    for (unsigned i = 0; i < m_connectedClients.size(); i++) {
+void Server::chatMessage() {
+    while (true) {
+        std::unique_lock<std::mutex> ul(socketToProcess.get()->m_chatMessageToProcess_mutex);
+        auto x = socketToProcess;
+        (socketToProcess.get()->m_chatMessageToProcess_cv).wait(ul, [x]() { return x.get()->m_chatMessageToProcess_ready;});
 
-        if ((std::get<0>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
-            (std::get<1>(m_connectedClients[i]))->sendMessageToClient(message);
-                break;
-        }
-        else if ((std::get<1>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
-            (std::get<0>(m_connectedClients[i]))->sendMessageToClient(message);
-            break;
-        }
-
-
-    }
-  //  m_connectedClients_mutex.unlock();
-
-
-}
-
-void Server::responseToConnect(OneClient& client, int value) {
-    //m_connectedClients_mutex.lock();
-    std::string message;
-    for (unsigned i = 0; i < m_connectedClients.size(); i++) {
-
-        if ((std::get<0>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
-            if (value == 1) {
-                //std::string message = "Klijent " + client.getName() + " zeli da se poveze sa Vama.\n";
-                 message = "Uspesno ste povezani. Mozete zapoceti dopisivanje.\n";
-                std::get<1>(m_connectedClients[i])->sendMessageToClient(message);
-                std::get<0>(m_connectedClients[i])->sendMessageToClient(message);
-               // std::get<2>(m_connectedClients[i]) = 1;
-                std::get<0>(m_connectedClients[i])->setCase(3);
-                std::get<1>(m_connectedClients[i])->setCase(3);
-                (std::get<1>(m_connectedClients[i]))->setState(new ClientInChat(client.getSocket()));
+        std::shared_ptr<OneClient> client = nullptr;
+        for (auto c : m_clients) {
+            if (c->getSocket() == socketToProcess->m_chatMessageSocketToProcess) {
+                client = c;
                 break;
             }
-            else if(value==-1) {
-                message = "Klijent je odbio vas zahtev za konekciju.\n";
-                std::get<1>(m_connectedClients[i])->sendMessageToClient(message);
-                std::get<1>(m_connectedClients[i])->setCase(1);
-                std::get<0>(m_connectedClients[i])->setCase(1);
-                (std::get<1>(m_connectedClients[i]))->setState(new NotConnected(client.getSocket()));
+        }
+
+        std::string message = socketToProcess.get()->m_chatMessageToProcess;
+
+
+        //kopiranje implementacije
+        for (unsigned i = 0; i < m_connectedClients.size(); i++) {
+
+            if (m_connectedClients[i].first->getSocket() == client->getSocket()) {
+                (m_connectedClients[i].second->sendMessageToClient(message));
+                break;
+            }
+            else if (m_connectedClients[i].second->getSocket() == client->getSocket()) {
+                (m_connectedClients[i].first->sendMessageToClient(message));
+                break;
+            }
+
+
+        }
+
+        socketToProcess.get()->m_chatMessageToProcess_ready = false;
+        ul.unlock();
+    }
+}
+
+void Server::responseToConnect() {
+    while (true) {
+        std::unique_lock<std::mutex> ul(socketToProcess.get()->m_responseToProcess_mutex);
+        auto x = socketToProcess;
+        (socketToProcess.get()->m_responseToProcess_cv).wait(ul, [x]() { return x.get()->m_responseToProcess_ready;});
+
+        std::shared_ptr<OneClient> client = nullptr;
+        for (auto c : m_clients) {
+            if (c->getSocket() == socketToProcess->m_responseSocketToProcess) {
+                client = c;
+                break;
+            }
+        }
+
+        int value = socketToProcess.get()->m_responseToProcess;
+
+        //kopiram prethodnu implementaciju
+        std::string message;
+        for (unsigned i = 0; i < m_connectedClients.size(); i++) {
+
+            if ((m_connectedClients[i]).second->getSocket() == client->getSocket()) {
+                if (value == 1) {
+                    message = "Uspesno ste povezani. Mozete zapoceti dopisivanje.\n";
+                    m_connectedClients[i].second->sendMessageToClient(message);
+                    m_connectedClients[i].first->sendMessageToClient(message);
+                    (m_connectedClients[i].second)->setState(new ClientInChat(client->getSocket(), socketToProcess));
+                    break;
+                }
+                else if (value == -1) {
+                    m_connectedClients[i].second->sendMessageToClient(message);
+                    m_connectedClients[i].second->setState(new NotConnected(client->getSocket(), socketToProcess));
+                    m_connectedClients.erase(m_connectedClients.begin() + i);
+                    break;
+                }
+
+            }
+        }
+
+        socketToProcess.get()->m_responseToProcess_ready = false;
+        ul.unlock();
+    }
+}
+
+void  Server::clientLeftTheChat() {
+    while (true) {
+        std::unique_lock<std::mutex> ul(socketToProcess.get()->m_leftChatToProcess_mutex);
+        auto x = socketToProcess;
+        (socketToProcess.get()->m_leftChatToProcess_cv).wait(ul, [x]() { return x.get()->m_leftChatToProcess_ready;});
+
+        std::shared_ptr<OneClient> client = nullptr;
+        for (auto c : m_clients) {
+            if (c->getSocket() == socketToProcess->m_leftChatSocketToProcess) {
+                client = c;
+                break;
+            }
+        }
+
+        //kopiram prethodnu implementaciju
+        std::string message = client->getName() + " has left the chat\n";
+
+        for (unsigned i = 0; i < m_connectedClients.size(); i++) {
+
+            if ((m_connectedClients[i].first)->getSocket() == client->getSocket()) {
+                (m_connectedClients[i].second)->sendMessageToClient(message);
+                m_connectedClients[i].second->setState(new NotConnected(client->getSocket(), socketToProcess));
                 m_connectedClients.erase(m_connectedClients.begin() + i);
                 break;
             }
-            else if (value == -2) {
-                message = "Klijent se diskonektovao sa servera!\n";
-                std::get<1>(m_connectedClients[i])->sendMessageToClient(message);
-                std::get<1>(m_connectedClients[i])->setCase(1);
-                //std::get<0>(m_connectedClients[i])->setCase(0);
-                //std::get<1>(m_connectedClients[i])->sendMessageToClient(std::get<0>(m_connectedClients[i])->getName());
+            else if ((m_connectedClients[i].second)->getSocket() == client->getSocket()) {
+                (m_connectedClients[i].first)->sendMessageToClient(message);
+                m_connectedClients[i].first->setState(new NotConnected(client->getSocket(), socketToProcess));
                 m_connectedClients.erase(m_connectedClients.begin() + i);
                 break;
             }
 
+
         }
-   }
-   // m_connectedClients_mutex.unlock();
 
-   // std::cout << (std::get<0>(m_connectedClients[0]))->getSocket() << std::endl;
-    //std::cout << (std::get<1>(m_connectedClients[0]))->getSocket() << std::endl;
-    //std::cout << (std::get<2>(m_connectedClients[0])) << std::endl;
- 
-}
 
-void Server::hookResponseToConnect(std::shared_ptr<OneClient> client) {
-    __hook(&OneClient::ResponseToConnect, client.get(), &Server::responseToConnect);
+        socketToProcess.get()->m_leftChatToProcess_ready = false;
+        ul.unlock();
+    }
 }
 
 
-void  Server::clientLeftTheChat(OneClient& client) {
+void Server::deleteClient(){
+    while (true) {
+        std::unique_lock<std::mutex> ul(socketToProcess.get()->m_clientLeftAppToProcess_mutex);
+        auto x = socketToProcess;
+        (socketToProcess.get()->m_clientLeftAppToProcess_cv).wait(ul, [x]() { return x.get()->m_clientLeftAppToProcess_ready;});
 
-    std::string message = client.getName() + " has left the chat\n";
-
-    for (unsigned i = 0; i < m_connectedClients.size(); i++) {
-
-        if ((std::get<0>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
-            (std::get<1>(m_connectedClients[i]))->sendMessageToClient(message);
-            std::get<0>(m_connectedClients[i])->setCase(1);
-            std::get<1>(m_connectedClients[i])->setCase(1);
-            std::get<1>(m_connectedClients[i])->setState(new NotConnected(client.getSocket()));
-            m_connectedClients.erase(m_connectedClients.begin() + i);
-            break;
+        std::shared_ptr<OneClient> client = nullptr;
+        for (auto c : m_clients) {
+            if (c->getSocket() == socketToProcess->m_clientLeftAppSocketToProcess) {
+                client = c;
+                break;
+            }
         }
-        else if ((std::get<1>(m_connectedClients[i]))->getSocket() == client.getSocket()) {
-            (std::get<0>(m_connectedClients[i]))->sendMessageToClient(message);
-            std::get<0>(m_connectedClients[i])->setCase(1);
-            std::get<1>(m_connectedClients[i])->setCase(1);
-            std::get<0>(m_connectedClients[i])->setState(new NotConnected(client.getSocket()));
-            m_connectedClients.erase(m_connectedClients.begin() + i);
-            break;
+        //kopija implementacije
+        for (unsigned i = 0; i < m_clients.size(); i++) {
+            if (m_clients[i]->getSocket() == client->getSocket()) {
+                m_clients.erase(m_clients.begin() + i);
+                break;
+            }
         }
 
+
+        socketToProcess.get()->m_clientLeftAppToProcess_ready = false;
+        ul.unlock();
 
     }
-
-
-}
-void  Server::hookClientLeftTheChat(std::shared_ptr<OneClient>& client) {
-
-    __hook(&OneClient::ClientLeftTheChat, client.get(), &Server::clientLeftTheChat);
-}
-
-
-void Server::deleteClient(OneClient& client) {
-
-    for (unsigned i = 0; i < m_clients.size(); i++) {
-        if (m_clients[i]->getSocket() == client.getSocket()) {
-            m_clients.erase(m_clients.begin() + i);
-            break;
-        }
-    }
-
-}
-
-
-void Server::hookDeleteClient(std::shared_ptr<OneClient>& client) {
-    __hook(&OneClient::DeleteClient, client.get(), &Server::deleteClient);
-
 }

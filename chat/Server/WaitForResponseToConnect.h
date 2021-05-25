@@ -1,7 +1,7 @@
 #pragma once
-#include "State.h"
+#ifndef _WAITFORRESTOCONN_
+#define _WAITFORRESTOCONN_
 #include "NotInChat.h"
-
 
 #define DEFAULT_BUFLEN 512
 
@@ -11,7 +11,7 @@ class WaitForResponseToConnect : public NotInChat {
 
 public:
 
-	WaitForResponseToConnect (SOCKET& client) : m_clientSocket(client) {};;
+	WaitForResponseToConnect (SOCKET& client, std::shared_ptr<SharedElement> &socketToProcess);
 
 	State* nextState() override;
 	void messageCome(SOCKET& client, std::string& message) override;
@@ -19,3 +19,4 @@ public:
 	SOCKET m_clientSocket;
 
 };
+#endif

@@ -145,12 +145,13 @@
     <ClInclude Include="ClientInChat.h" />
     <ClInclude Include="ClientRegistration.h" />
     <ClInclude Include="HaveRequestForConnection.h" />
-    <ClInclude Include="Locks.h" />
+    <ClInclude Include="LeftApp.h" />
     <ClInclude Include="NotConnected.h" />
     <ClInclude Include="NotInChat.h" />
     <ClInclude Include="OneClient.h" />
     <ClInclude Include="Read.h" />
     <ClInclude Include="Server.h" />
+    <ClInclude Include="SharedElement.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="WaitForResponseToConnect.h" />
     <ClInclude Include="Write.h" />

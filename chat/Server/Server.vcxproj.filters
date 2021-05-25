@@ -48,7 +48,10 @@
     <ClInclude Include="ClientInChat.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Locks.h">
+    <ClInclude Include="SharedElement.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LeftApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

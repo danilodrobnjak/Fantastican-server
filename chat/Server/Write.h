@@ -1,4 +1,8 @@
 #pragma once
+#ifndef _WRITE_H
+#define _WRITE_H
+
+
 #define WIN32_LEAN_AND_MEAN
 #define DEFAULT_BUFLEN 512
 #include <iostream>
@@ -29,3 +33,4 @@ private:
 	bool m_newMessage=false;
 	std::mutex mtx;
 };
+#endif // !_WRITE_H

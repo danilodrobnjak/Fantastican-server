@@ -1,4 +1,6 @@
 #pragma once
+#ifndef _SERVER_H
+#define _SERVER_H
 #define WIN32_LEAN_AND_MEAN
 #include "OneClient.h"
 #include <string>
@@ -11,7 +13,11 @@
 #include <unordered_map>
 #include <tuple>
 #include <mutex>
-//#include "Locks.h"
+#include "HaveRequestForConnection.h"
+#include "NotConnected.h";
+#include "ClientInChat.h"
+#include "SharedElement.h"
+#define DEFAULT_BUFLEN 512
 
 #pragma comment (lib, "Ws2_32.lib")
 
@@ -19,9 +25,16 @@ class Server  {
 
 public:
 	Server(std::string name, std::string port,bool &initWsa);
+	
 	~Server();
 	void run();
-	void addNewClient2();
+	void addNewClient();
+	void tryToConnect();
+	void responseToConnect();
+	void chatMessage();
+	void clientLeftTheChat();
+	void deleteClient();
+	
 
 
 private:
@@ -31,23 +44,14 @@ private:
 	SOCKET m_ListenSocket;
 	std::vector<std::shared_ptr<OneClient>> m_clients;
 	//std::mutex m_clients_mutex;
-	std::vector <std::tuple<std::shared_ptr<OneClient>, std::shared_ptr<OneClient>>> m_connectedClients;
+	std::vector <std::pair<std::shared_ptr<OneClient>, std::shared_ptr<OneClient>>> m_connectedClients;
 	//std::mutex m_connectedClients_mutex;
 
+	std::shared_ptr<SharedElement> socketToProcess = std::make_shared<SharedElement>(SharedElement(INVALID_SOCKET));
+
+
 	bool initWSA();
-	void addNewClient(OneClient& client);
-	void hookAddNewClient(std::shared_ptr<OneClient> client);
-   
 	
-	void tryToConnect(OneClient &client, std::string& name);
-	void hookTryToConnect(std::shared_ptr<OneClient>& client);
-	void responseToConnect(OneClient& client, int value);
-	void hookResponseToConnect(std::shared_ptr<OneClient> client);
-	void chatMessage(OneClient& client, std::string& message);
-	void hookChatMessage(std::shared_ptr<OneClient>& client);
-    void clientLeftTheChat(OneClient& client);
-	void hookClientLeftTheChat(std::shared_ptr<OneClient>& client);
-	void deleteClient(OneClient& client);
-	void hookDeleteClient(std::shared_ptr<OneClient>& client);
 };
+#endif
 
