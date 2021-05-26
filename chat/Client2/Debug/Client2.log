@@ -1,3 +1,0 @@
-﻿  Client2.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Client2\Client2.cpp(76,10): warning C4101: 'recvbuf': unreferenced local variable
-  Client2.vcxproj -> C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Desktop\chat\Server\Debug\Client2.exe
