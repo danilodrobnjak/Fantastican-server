@@ -1,0 +1,3 @@
+﻿  Client3.cpp
+C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\Fantastican-server-main\Fantastican-server-main\chat\Client3\Client3.cpp(76,10): warning C4101: 'recvbuf': unreferenced local variable
+  Client3.vcxproj -> C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\Fantastican-server-main\Fantastican-server-main\chat\Server\Debug\Client3.exe
