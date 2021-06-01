@@ -109,17 +109,15 @@ void Server::addNewClient() {
    
     while (true) {
 
-        std::unique_lock<std::mutex> ul(socketToProcess.get()->m_socketToProcess_mutex);
-        auto x = socketToProcess;
-        (socketToProcess.get()->m_socketToProcess_cv).wait(ul, [x]() { return x.get()->m_socketToProcess_ready;});
+        SOCKET m_socketToProcess = socketToProcess->m_socketToProcess.dequeue();
 
-        if ((*socketToProcess.get()).m_socketToProcess != INVALID_SOCKET) {
-            std::cout << (*socketToProcess.get()).m_socketToProcess << std::endl;
+        if (m_socketToProcess != INVALID_SOCKET) {
+            std::cout << m_socketToProcess << std::endl;
 
             std::shared_ptr<OneClient> client = nullptr;
             m_clients_mutex.lock_shared();
             for (auto c : m_clients) {
-                if (c->getSocket() == socketToProcess->m_socketToProcess) {
+                if (c->getSocket() == m_socketToProcess) {
                     client = c;
                     break;
                 }
@@ -152,10 +150,6 @@ void Server::addNewClient() {
 
         }
         m_clients_mutex.unlock_shared();
-        socketToProcess.get()->m_socketToProcess_ready = false;
-
-        ul.unlock();
-
     }
 }
 
@@ -163,21 +157,20 @@ void Server::addNewClient() {
 void Server::tryToConnect() {
     while(true){
 
-            std::unique_lock<std::mutex> ul(socketToProcess.get()->m_nameToProcess_mutex);
-            auto x = socketToProcess;
-            (socketToProcess.get()->m_nameToProcess_cv).wait(ul, [x]() { return x.get()->m_nameToProcess_ready;});
+            auto m_nameToProcess = socketToProcess->m_nameToProcess.dequeue();
+
             m_clients_mutex.lock_shared();
-            std::shared_ptr<OneClient> client = nullptr;
+            std::shared_ptr<OneClient> client;
 
             m_clients_mutex.lock_shared();
             for (auto c : m_clients) {
-                    if (c->getSocket() == socketToProcess->m_nameSocketToProcess) {
+                    if (c->getSocket() == m_nameToProcess.second) {
                              client = c;
                              break;
                     }
             }
 
-           std::string name = socketToProcess.get()->m_nameToProcess;
+           std::string name = m_nameToProcess.first;
 
             //kopija prethodne implementacije funkcije
            int first = 0, second = 0;
@@ -233,29 +226,27 @@ void Server::tryToConnect() {
        
            }
            m_clients_mutex.unlock_shared();
-           socketToProcess.get()->m_nameToProcess_ready = false;
-           ul.unlock();
+         
     }
 }
 
 
 void Server::chatMessage() {
     while (true) {
-        std::unique_lock<std::mutex> ul(socketToProcess.get()->m_chatMessageToProcess_mutex);
-        auto x = socketToProcess;
-        (socketToProcess.get()->m_chatMessageToProcess_cv).wait(ul, [x]() { return x.get()->m_chatMessageToProcess_ready;});
+       
+        auto m_chatMessageToProcess = socketToProcess->m_chatMessageToProcess.dequeue();
 
-        std::shared_ptr<OneClient> client = nullptr;
+        std::shared_ptr<OneClient> client;
 
         m_clients_mutex.lock_shared();
         for (auto c : m_clients) {
-            if (c->getSocket() == socketToProcess->m_chatMessageSocketToProcess) {
+            if (c->getSocket() == m_chatMessageToProcess.second) {
                 client = c;
                 break;
             }
         }
 
-        std::string message = socketToProcess.get()->m_chatMessageToProcess;
+        std::string message = m_chatMessageToProcess.first;
 
 
         //kopiranje implementacije
@@ -274,27 +265,25 @@ void Server::chatMessage() {
         m_connectedClients_mutex.unlock_shared();
 
         m_clients_mutex.unlock_shared();
-        socketToProcess.get()->m_chatMessageToProcess_ready = false;
-        ul.unlock();
+        
     }
 }
 
 void Server::responseToConnect() {
     while (true) {
-        std::unique_lock<std::mutex> ul(socketToProcess.get()->m_responseToProcess_mutex);
-        auto x = socketToProcess;
-        (socketToProcess.get()->m_responseToProcess_cv).wait(ul, [x]() { return x.get()->m_responseToProcess_ready;});
 
-        std::shared_ptr<OneClient> client = nullptr;
+      auto m_responseToProcess = socketToProcess->m_responseToProcess.dequeue();
+
+        std::shared_ptr<OneClient> client ;
         m_clients_mutex.lock_shared();
         for (auto c : m_clients) {
-            if (c->getSocket() == socketToProcess->m_responseSocketToProcess) {
+            if (c->getSocket() == m_responseToProcess.second) {
                 client = c;
                 break;
             }
         }
 
-        int value = socketToProcess.get()->m_responseToProcess;
+        int value = m_responseToProcess.first;
 
         //kopiram prethodnu implementaciju
         std::string message;
@@ -321,21 +310,19 @@ void Server::responseToConnect() {
         m_connectedClients_mutex.unlock();
 
         m_clients_mutex.unlock_shared();
-        socketToProcess.get()->m_responseToProcess_ready = false;
-        ul.unlock();
+     
     }
 }
 
 void  Server::clientLeftTheChat() {
     while (true) {
-        std::unique_lock<std::mutex> ul(socketToProcess.get()->m_leftChatToProcess_mutex);
-        auto x = socketToProcess;
-        (socketToProcess.get()->m_leftChatToProcess_cv).wait(ul, [x]() { return x.get()->m_leftChatToProcess_ready;});
+        
+        auto m_leftChatToProcess = socketToProcess->m_leftChatToProcess.dequeue();
 
-        std::shared_ptr<OneClient> client = nullptr;
+        std::shared_ptr<OneClient> client ;
         m_clients_mutex.lock_shared();
         for (auto c : m_clients) {
-            if (c->getSocket() == socketToProcess->m_leftChatSocketToProcess) {
+            if (c->getSocket() == m_leftChatToProcess) {
                 client = c;
                 break;
             }
@@ -364,23 +351,21 @@ void  Server::clientLeftTheChat() {
         m_connectedClients_mutex.unlock();
 
         m_clients_mutex.unlock_shared();
-        socketToProcess.get()->m_leftChatToProcess_ready = false;
-        ul.unlock();
+     
     }
 }
 
 
 void Server::deleteClient(){
     while (true) {
-        std::unique_lock<std::mutex> ul(socketToProcess.get()->m_clientLeftAppToProcess_mutex);
-        auto x = socketToProcess;
-        (socketToProcess.get()->m_clientLeftAppToProcess_cv).wait(ul, [x]() { return x.get()->m_clientLeftAppToProcess_ready;});
+      
+        auto m_clientLeftAppToProcess = socketToProcess->m_clientLeftAppToProcess.dequeue();
 
-        std::shared_ptr<OneClient> client = nullptr;
+        std::shared_ptr<OneClient> client;
         m_clients_mutex.lock();
 
         for (auto c : m_clients) {
-            if (c->getSocket() == socketToProcess->m_clientLeftAppSocketToProcess) {
+            if (c->getSocket() == m_clientLeftAppToProcess) {
                 client = c;
                 break;
             }
@@ -396,8 +381,7 @@ void Server::deleteClient(){
         m_clients_mutex.unlock();
 
 
-        socketToProcess.get()->m_clientLeftAppToProcess_ready = false;
-        ul.unlock();
+        
 
     }
 }

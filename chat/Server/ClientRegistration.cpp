@@ -2,7 +2,7 @@
 
 
 
-ClientRegistration::ClientRegistration(SOCKET& client,std::string *name, std::shared_ptr<SharedElement>& socketToProcess)
+ClientRegistration::ClientRegistration(SOCKET& client,std::string *name, std::shared_ptr<SharedElement> socketToProcess)
 	:State(socketToProcess),m_name(name),m_clientSocket(client){
 
 }

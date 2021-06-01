@@ -12,6 +12,7 @@
 #include <ws2tcpip.h>
 #include "SharedElement.h"
 #include "Log.h"
+#include "SafeQueue.h"
 
 
 
@@ -23,7 +24,7 @@ class State {
 
 public:
 
-	State(std::shared_ptr<SharedElement>& socketToProcess)
+	State(std::shared_ptr<SharedElement> socketToProcess)
 	:socketToProcess(socketToProcess){
 	};
 	

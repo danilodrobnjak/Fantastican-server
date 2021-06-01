@@ -48,7 +48,7 @@ private:
 	std::vector<std::shared_ptr<OneClient>> m_clients;
 	std::shared_mutex m_connectedClients_mutex;
 	std::vector <std::pair<std::shared_ptr<OneClient>, std::shared_ptr<OneClient>>> m_connectedClients;
-	std::shared_ptr<SharedElement> socketToProcess = std::make_shared<SharedElement>(SharedElement(INVALID_SOCKET));
+	std::shared_ptr<SharedElement> socketToProcess = std::make_shared<SharedElement>(SharedElement());
 
 
 	bool initWSA();

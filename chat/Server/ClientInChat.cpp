@@ -1,6 +1,6 @@
 #include "ClientInChat.h"
 
-ClientInChat::ClientInChat(SOCKET& client, std::shared_ptr<SharedElement>& socketToProcess)
+ClientInChat::ClientInChat(SOCKET& client, std::shared_ptr<SharedElement> socketToProcess)
 	: State(socketToProcess), m_clientSocket(client) {
 
 };
@@ -53,31 +53,16 @@ void  ClientInChat::messageCome(SOCKET& client, std::string& message) {
 
 	if (!message.compare("cao\n")) {
 		endConversation = true;
-		std::unique_lock<std::mutex> ul(socketToProcess.get()->m_leftChatToProcess_mutex);
-
-	
-		(*socketToProcess.get()).m_leftChatSocketToProcess = client;
-
-		socketToProcess.get()->m_leftChatToProcess_ready = true;
-
-		ul.unlock();
-
-		socketToProcess.get()->m_leftChatToProcess_cv.notify_one();
+		
+		socketToProcess->m_leftChatToProcess.enqueue(client);
+		
 	}
 	else if (!message.compare("q\n")) {
 		m_clientLeftApp = true;
 	}
 	else {
-		std::unique_lock<std::mutex> ul(socketToProcess.get()->m_chatMessageToProcess_mutex);
-
-		(*socketToProcess.get()).m_chatMessageToProcess = message;
-		(*socketToProcess.get()).m_chatMessageSocketToProcess = client;
-
-		socketToProcess.get()->m_chatMessageToProcess_ready = true;
-
-		ul.unlock();
-
-		socketToProcess.get()->m_chatMessageToProcess_cv.notify_one();
+		socketToProcess->m_chatMessageToProcess.enqueue(std::make_pair(message, client));
+	
 	}
 }
 

@@ -6,53 +6,37 @@
 #include <ws2tcpip.h>
 #include <mutex>
 #pragma comment (lib, "Ws2_32.lib")
+#include "SafeQueue.h"
 
 class SharedElement {
 
 public: 
-	SharedElement(SOCKET socketToProcess)
-		: m_socketToProcess(socketToProcess){
+	SharedElement()	{
 	}
 	SharedElement(const SharedElement& copy) {
 	}
 	~SharedElement() {
-
 	}
 	//NotConn
-	std::atomic<SOCKET> m_socketToProcess;
-	std::mutex  m_socketToProcess_mutex;
-	std::condition_variable m_socketToProcess_cv;
-	bool m_socketToProcess_ready = false;
-	//WaitFor
-	std::string m_nameToProcess;
-	SOCKET m_nameSocketToProcess;
-	std::mutex  m_nameToProcess_mutex;
-	std::condition_variable m_nameToProcess_cv;
-	bool m_nameToProcess_ready = false;
+	SafeQueue<SOCKET> m_socketToProcess;
+	
+	//NotConn
+	SafeQueue<std::pair<std::string,SOCKET>> m_nameToProcess;
+	
+
 	//HaveReq
-	int m_responseToProcess;
-	SOCKET m_responseSocketToProcess;
-	std::mutex  m_responseToProcess_mutex;
-	std::condition_variable m_responseToProcess_cv;
-	bool m_responseToProcess_ready = false;
+	SafeQueue<std::pair<int, SOCKET>> m_responseToProcess;
+	 
 	//ClientChat
-	std::string m_chatMessageToProcess;
-	SOCKET m_chatMessageSocketToProcess;
-	std::mutex  m_chatMessageToProcess_mutex;
-	std::condition_variable m_chatMessageToProcess_cv;
-	bool m_chatMessageToProcess_ready = false;
+	SafeQueue<std::pair<std::string, SOCKET>> m_chatMessageToProcess;
+
 
 	//ClientChat cao
-	SOCKET m_leftChatSocketToProcess;
-	std::mutex  m_leftChatToProcess_mutex;
-	std::condition_variable m_leftChatToProcess_cv;
-	bool m_leftChatToProcess_ready = false;
+	SafeQueue<SOCKET>  m_leftChatToProcess;
+	
 
 	//ClientChat q
-	SOCKET m_clientLeftAppSocketToProcess;
-	std::mutex  m_clientLeftAppToProcess_mutex;
-	std::condition_variable m_clientLeftAppToProcess_cv;
-	bool m_clientLeftAppToProcess_ready = false;
+	SafeQueue<SOCKET>  m_clientLeftAppToProcess;
 
 
 };

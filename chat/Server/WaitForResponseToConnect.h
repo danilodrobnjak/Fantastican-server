@@ -11,7 +11,7 @@ class WaitForResponseToConnect : public NotInChat {
 
 public:
 
-	WaitForResponseToConnect (SOCKET& client, std::shared_ptr<SharedElement> &socketToProcess);
+	WaitForResponseToConnect (SOCKET& client, std::shared_ptr<SharedElement> socketToProcess);
 
 	State* nextState() override;
 	void messageCome(SOCKET& client, std::string& message) override;

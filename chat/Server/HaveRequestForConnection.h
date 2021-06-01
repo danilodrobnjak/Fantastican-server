@@ -14,7 +14,7 @@ class HaveRequestForConnection : public NotInChat {
 
 public:
 
-	HaveRequestForConnection(SOCKET& client, std::shared_ptr<SharedElement>& socketToProcess);
+	HaveRequestForConnection(SOCKET& client, std::shared_ptr<SharedElement> socketToProcess);
 	State* nextState() override;
 	void messageCome(SOCKET& client, std::string& message) override;
 

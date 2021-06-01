@@ -14,7 +14,7 @@ class ClientRegistration : public State{
 
 public:
 	
-	ClientRegistration(SOCKET& client,std::string *name, std::shared_ptr<SharedElement>& socketToProcess);
+	ClientRegistration(SOCKET& client,std::string *name, std::shared_ptr<SharedElement> socketToProcess);
 	
      State* nextState() override;
 	 void messageCome(SOCKET& client, std::string& message) override;

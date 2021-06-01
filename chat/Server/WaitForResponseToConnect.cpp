@@ -1,7 +1,7 @@
 
 #include "WaitForResponseToConnect.h"
 
-WaitForResponseToConnect::WaitForResponseToConnect(SOCKET& client, std::shared_ptr<SharedElement>& socketToProcess)
+WaitForResponseToConnect::WaitForResponseToConnect(SOCKET& client, std::shared_ptr<SharedElement> socketToProcess)
 	:NotInChat(socketToProcess), m_clientSocket(client) {
 }
 

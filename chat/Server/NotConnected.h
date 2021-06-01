@@ -17,7 +17,7 @@ class NotConnected : public NotInChat {
 public:
 	
 
-	NotConnected(SOCKET& client, std::shared_ptr<SharedElement>& socketToProcess);
+	NotConnected(SOCKET& client, std::shared_ptr<SharedElement> socketToProcess);
 	 State* nextState() override;
 	 void messageCome(SOCKET& client, std::string& message) override;
 

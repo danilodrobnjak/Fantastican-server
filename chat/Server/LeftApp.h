@@ -7,17 +7,12 @@ class LeftApp :public State {
 
 
 public:
-	LeftApp(SOCKET &client,std::shared_ptr<SharedElement>& socketToProcess) 
+	LeftApp(SOCKET &client,std::shared_ptr<SharedElement> socketToProcess) 
 		:State(socketToProcess){
-		std::unique_lock<std::mutex> ul(socketToProcess.get()->m_clientLeftAppToProcess_mutex);
+		
 
-		(*socketToProcess.get()).m_clientLeftAppSocketToProcess = client;
+		socketToProcess->m_clientLeftAppToProcess.enqueue(client);
 
-		socketToProcess.get()->m_clientLeftAppToProcess_ready = true;
-
-		ul.unlock();
-
-		socketToProcess.get()->m_clientLeftAppToProcess_cv.notify_one();
 	
 	}
 	State* nextState() {

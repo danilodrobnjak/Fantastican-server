@@ -13,7 +13,7 @@ class NotInChat : public State {
 
 public:
 
-	NotInChat(std::shared_ptr<SharedElement>& socketToProcess)
+	NotInChat(std::shared_ptr<SharedElement> socketToProcess)
 	:State(socketToProcess){
 
 	}

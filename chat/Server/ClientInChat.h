@@ -15,7 +15,7 @@ class ClientInChat : public State {
 
 public:
 
-	ClientInChat(SOCKET& client, std::shared_ptr<SharedElement>& socketToProcess);
+	ClientInChat(SOCKET& client, std::shared_ptr<SharedElement> socketToProcess);
 
 	State* nextState() override;
 	void messageCome(SOCKET &client, std::string& message) override;

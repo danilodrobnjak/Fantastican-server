@@ -25,7 +25,7 @@
 class OneClient {
 
 public:
-	OneClient(SOCKET& ClientSocket, std::shared_ptr<SharedElement>& socketToProcess);
+	OneClient(SOCKET& ClientSocket, std::shared_ptr<SharedElement> socketToProcess);
 	OneClient() = default;
 	~OneClient();
 

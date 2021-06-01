@@ -1,6 +1,6 @@
 #include "OneClient.h"
 
-OneClient::OneClient(SOCKET& ClientSocket, std::shared_ptr<SharedElement>& socketToProcess)
+OneClient::OneClient(SOCKET& ClientSocket, std::shared_ptr<SharedElement> socketToProcess)
     :m_ClientSocket(ClientSocket), m_socketToProcess(socketToProcess){
     
     ZeroMemory(m_recvbuf, m_recvbuflen);

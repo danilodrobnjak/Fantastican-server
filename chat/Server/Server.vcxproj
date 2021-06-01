@@ -151,6 +151,7 @@
     <ClInclude Include="NotInChat.h" />
     <ClInclude Include="OneClient.h" />
     <ClInclude Include="Read.h" />
+    <ClInclude Include="SafeQueue.h" />
     <ClInclude Include="Server.h" />
     <ClInclude Include="SharedElement.h" />
     <ClInclude Include="State.h" />

@@ -1,3 +1,1 @@
-﻿  Client2.cpp
-C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\posl ver\Fantastican-server-main\chat\Client2\Client2.cpp(76,10): warning C4101: 'recvbuf': unreferenced local variable
-  Client2.vcxproj -> C:\Users\danilo.drobnjak\OneDrive - ENDAVA\Desktop\posl ver\Fantastican-server-main\chat\Server\Debug\Client2.exe
+﻿  Client2.vcxproj -> C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\Debug\Client2.exe
