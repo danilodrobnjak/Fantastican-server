@@ -19,6 +19,8 @@ void Write::run() {
         }
             mtx.lock();
             m_iResult = send(m_clientSocket, m_sendbuf, m_sendbuflen, 0);
+            if ((m_iResult == 0))
+                break;
             //std::cout << m_iResult;
            // std::cout << m_sendbuf << std::endl;
             m_newMessage = false;

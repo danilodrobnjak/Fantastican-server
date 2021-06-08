@@ -2,36 +2,30 @@
 
 OneClient::OneClient(SOCKET& ClientSocket, std::shared_ptr<SharedElement> socketToProcess)
     :m_ClientSocket(ClientSocket), m_socketToProcess(socketToProcess){
-    
-    ZeroMemory(m_recvbuf, m_recvbuflen);
-    ZeroMemory(m_sendbuf, m_sendbuflen);
-
+ 
     m_read = std::make_shared<Read>(m_ClientSocket);
     m_write = std::make_shared <Write>(m_ClientSocket);
 
     m_state = new ClientRegistration(m_ClientSocket,&m_name, m_socketToProcess);
+
+  
+   citanje = std::thread (&Read::run, m_read);
+   pisanje = std::thread(&Write::run, m_write);
+   hookMessageCome(m_read);
 }
 OneClient::~OneClient() {
 
     // int iResult;
-    // iResult = shutdown(ClientSocket, SD_BOTH);   // Shutdown both send and receive operations.
+   //  iResult = shutdown(m_ClientSocket, SD_BOTH);   // Shutdown both send and receive operations.
     // if (iResult == SOCKET_ERROR) {
     //     printf("shutdown failed with error: %d\n", WSAGetLastError());
     //     closesocket(ClientSocket);
     //     WSACleanup();
     // }
-
-    closesocket(m_ClientSocket);
-    std::cout << "Klijent destr" << std::endl;
-}
-
-void OneClient::run() {
-
-    std::thread citanje(&Read::run, m_read);
-    std::thread pisanje(&Write::run, m_write);
-    hookMessageCome(m_read);
     citanje.join();
     pisanje.join();
+    closesocket(m_ClientSocket);
+    std::cout << "Klijent destr" << std::endl;
 }
 
 std::string OneClient::getName() {

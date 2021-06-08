@@ -25,17 +25,8 @@
 class Server  {
 
 public:
-	Server(std::string name, std::string port,bool &initWsa);
-	
+	Server(std::string name, std::string port,bool &initWsa);	
 	~Server();
-	void run();
-	void addNewClient();
-	void tryToConnect();
-	void responseToConnect();
-	void chatMessage();
-	void clientLeftTheChat();
-	void deleteClient();
-	
 
 
 private:
@@ -50,8 +41,23 @@ private:
 	std::vector <std::pair<std::shared_ptr<OneClient>, std::shared_ptr<OneClient>>> m_connectedClients;
 	std::shared_ptr<SharedElement> socketToProcess = std::make_shared<SharedElement>(SharedElement());
 
+	std::thread  m_runThread;
+	std::thread  m_addNewClientThread;
+	std::thread  m_tryToConnectThread;
+	std::thread  m_responseToConnectThread;
+	std::thread  m_chatMessageThread;
+	std::thread  m_clientLeftTheChatThread;
+	std::thread  m_deleteClient;
+	
 
 	bool initWSA();
+	void run();
+	void addNewClient();
+	void tryToConnect();
+	void responseToConnect();
+	void chatMessage();
+	void clientLeftTheChat();
+	void deleteClient();
 	
 };
 #endif

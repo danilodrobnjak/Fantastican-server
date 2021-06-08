@@ -1,30 +1,11 @@
-﻿  ClientInChat.cpp
-  ClientRegistration.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\ClientRegistration.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file ClientRegistration.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\ClientRegistration.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\ClientInChat.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file ClientInChat.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\ClientInChat.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-  HaveRequestForConnection.cpp
-  MainServer.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\NotInChat.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file HaveRequestForConnection.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\HaveRequestForConnection.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
+﻿  MainServer.cpp
+  Server.cpp
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\OneClient.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file Server.cpp)
+C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\Server.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
 C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\OneClient.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file MainServer.cpp)
 C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\MainServer.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
 C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\HaveRequestForConnection.h(6,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file MainServer.cpp)
 C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\Server.h(18,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file MainServer.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\HaveRequestForConnection.h(6,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file HaveRequestForConnection.cpp)
-  NotConnected.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\NotConnected.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file NotConnected.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\NotConnected.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-  OneClient.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\OneClient.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file OneClient.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\OneClient.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-  Server.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\OneClient.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file Server.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\Server.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
-  WaitForResponseToConnect.cpp
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\NotInChat.h(5,1): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition (compiling source file WaitForResponseToConnect.cpp)
-C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\WaitForResponseToConnect.cpp : message : see previous definition of '_CRT_SECURE_NO_WARNINGS'
 C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\HaveRequestForConnection.h(6,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file Server.cpp)
 C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\Server.h(18,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline (compiling source file Server.cpp)
   Server.vcxproj -> C:\Users\aleksandra.boskovic\OneDrive - ENDAVA\Documents\GitHub\Fantastican-server\chat\Server\Debug\Server.exe

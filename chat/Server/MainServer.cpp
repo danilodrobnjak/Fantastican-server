@@ -4,28 +4,34 @@
 #define DEFAULT_PORT "27015"
 #define SERVER_NAME "localhost"
 
+/*
+class parser
+{
+public:
+	parser(int argv, char** argc);
+	bool is_input_valid()
+};
+
+void usage()
+{
+	const char* message = "Usage:\n - -p port"
+}
+*/
 
 int main(int argv, char** argc) {
 
 	bool initWSA = false; 
 
-	Server server(SERVER_NAME, DEFAULT_PORT ,initWSA);
+	//parser p(argv);
+	//if (!p.is_input_valid())
+	//{
+	//	usage();
+	//	return EXIT_FAILURE;
+	//}
+	Server server(SERVER_NAME, DEFAULT_PORT, initWSA);
 
 	if (initWSA) {
-		std::thread Serverska_nit(&Server::run, &server);
-		std::thread Serverska_nit2(&Server::addNewClient, &server);
-		std::thread Serverska_nit3(&Server::tryToConnect, &server);
-		std::thread Serverska_nit4(&Server::responseToConnect, &server);
-		std::thread Serverska_nit5(&Server::chatMessage, &server);
-		std::thread Serverska_nit6(&Server::clientLeftTheChat, &server);
-		std::thread Serverska_nit7(&Server::deleteClient, &server);
-		Serverska_nit.join();
-		Serverska_nit2.join();
-		Serverska_nit3.join();
-		Serverska_nit4.join();
-		Serverska_nit5.join();
-		Serverska_nit6.join();
-		Serverska_nit7.join();
+		std::cout << "Server start.... " << std::endl;
 	}
 	else {
 		std::cout <<"WSAStartup failed " << std::endl;

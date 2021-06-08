@@ -8,7 +8,7 @@ State* HaveRequestForConnection::nextState() {
 	if (m_clientLeftApp) {
 		return new LeftApp(m_clientSocket, this->socketToProcess);
 	}
-	if (!m_response.compare("da\n")) {
+	else if (!m_response.compare("da\n")) {
 	
 		return new ClientInChat(m_clientSocket, this->socketToProcess);
 	}

@@ -11,6 +11,8 @@ void Read::run() {
     std::string message;
     while (!m_end) {
         m_iResult = recv(m_clientSocket, m_recvbuf, m_recvbuflen, 0);
+        if ((m_iResult == 0))
+            break;
         message = m_recvbuf;
         MessageCome(message);
         ZeroMemory(m_recvbuf, m_recvbuflen);

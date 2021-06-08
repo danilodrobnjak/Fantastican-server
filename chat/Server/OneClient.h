@@ -34,7 +34,7 @@ public:
 	State* getState();
 	void setState(State* state);
 
-	void run();
+
 	void sendMessageToClient(std::string& message);
 	void messageCome(std::string& message);
 	friend bool operator!=(const OneClient& one, const OneClient& two);
@@ -44,16 +44,14 @@ private:
 
 	std::string m_name;
 	SOCKET m_ClientSocket;
-	char m_sendbuf[DEFAULT_BUFLEN];
-	char m_recvbuf[DEFAULT_BUFLEN];
-	int m_recvbuflen = DEFAULT_BUFLEN;
-	int m_sendbuflen = DEFAULT_BUFLEN;
 	bool m_end = false;
-	std::shared_ptr<Read> m_read;
-	std::shared_ptr<Write> m_write;
-
 	State* m_state;
 	std::shared_ptr<SharedElement> m_socketToProcess;
+	std::shared_ptr<Read> m_read;
+	std::shared_ptr<Write> m_write;
+	std::thread citanje;
+	std::thread pisanje;
+
 
 	void hookMessageCome(std::shared_ptr<Read> read);
 

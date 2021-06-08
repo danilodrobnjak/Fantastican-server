@@ -9,10 +9,7 @@ class LeftApp :public State {
 public:
 	LeftApp(SOCKET &client,std::shared_ptr<SharedElement> socketToProcess) 
 		:State(socketToProcess){
-		
-
 		socketToProcess->m_clientLeftAppToProcess.enqueue(client);
-
 	
 	}
 	State* nextState() {
