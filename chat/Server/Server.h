@@ -25,7 +25,7 @@
 class Server  {
 
 public:
-	Server(std::string name, std::string port,bool &initWsa);	
+	Server(std::string name, std::string port);	
 	~Server();
 
 
@@ -35,6 +35,7 @@ private:
 	std::string m_port;
 	SOCKET m_ListenSocket;
 
+	
 	std::shared_mutex m_clients_mutex;
 	std::vector<std::shared_ptr<OneClient>> m_clients;
 	std::shared_mutex m_connectedClients_mutex;
@@ -48,9 +49,10 @@ private:
 	std::thread  m_chatMessageThread;
 	std::thread  m_clientLeftTheChatThread;
 	std::thread  m_deleteClient;
+	std::thread	 m_dispatch;
 	
 
-	bool initWSA();
+	void dispatch();
 	void run();
 	void addNewClient();
 	void tryToConnect();

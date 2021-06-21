@@ -144,12 +144,15 @@
   <ItemGroup>
     <ClInclude Include="ClientInChat.h" />
     <ClInclude Include="ClientRegistration.h" />
+    <ClInclude Include="E_Parser.h" />
+    <ClInclude Include="E_WsaFaildServer.h" />
     <ClInclude Include="HaveRequestForConnection.h" />
     <ClInclude Include="LeftApp.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="NotConnected.h" />
     <ClInclude Include="NotInChat.h" />
     <ClInclude Include="OneClient.h" />
+    <ClInclude Include="Parser.h" />
     <ClInclude Include="Read.h" />
     <ClInclude Include="SafeQueue.h" />
     <ClInclude Include="Server.h" />
@@ -167,6 +170,7 @@
     <ClCompile Include="MainServer.cpp" />
     <ClCompile Include="NotConnected.cpp" />
     <ClCompile Include="OneClient.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="Read.cpp" />
     <ClCompile Include="Server.cpp" />
     <ClCompile Include="WaitForResponseToConnect.cpp" />

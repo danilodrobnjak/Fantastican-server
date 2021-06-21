@@ -47,7 +47,7 @@ private:
 	bool m_end = false;
 	State* m_state;
 	std::shared_ptr<SharedElement> m_socketToProcess;
-	std::shared_ptr<Read> m_read;
+	//std::shared_ptr<Read> m_read;
 	std::shared_ptr<Write> m_write;
 	std::thread citanje;
 	std::thread pisanje;

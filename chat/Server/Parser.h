@@ -7,7 +7,7 @@
 #include<regex>
 #include "E_Parser.h"
 
-enum Spasoje
+enum  Spasoje
 {
 	PORT,HOST
 };
@@ -17,7 +17,8 @@ class Parser {
 	std::queue<std::string> m_smartQueue;
 	std::string m_defPort;
 	std::string m_defHost;
-
+	
+	bool m_inputValid;
 
 
 	void resolveProblemQueue();

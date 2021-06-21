@@ -1,54 +1,56 @@
-#include <iostream>
 #include "Server.h"
 #include "Parser.h"
+#include"E_WsaFaildServer.h"
 
 #define DEFAULT_PORT "27015"
 #define SERVER_NAME "localhost"
 
-/*
-class parser
-{
-public:
-	parser(int argv, char** argc);
-	bool is_input_valid()
-};
-*/
+
 void usage()
 {
 	const char* message = "Usage:\n  MainServer [--port -p] portValue\n []";
 }
+void initWSA() {
 
+	WSADATA wsaData;
+	int iResult;
+
+	// Initialize Winsock
+	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	if (iResult != 0) {
+		throw new E_WsaFaildServer();
+	}
+
+	return;
+}
 
 int main(int argv, char** argc) {
 
-	bool initWSA = false; 
-
-	
-	//Parser p(argv, argc);
+		
+		
 	try
 	{
-		Parser p(argv, argc);
+		initWSA();
 	}
-	catch (E_Parser& it)
-	{
-		std::cout << it<<std::endl;
+	catch (E_WsaFaildServer&){
+		std::cout << "WSAStartup failed " << std::endl;
 	}
+	std::cout << "Server start.... " << std::endl;
 
-	//parser p(argv);
-	//if (!p.is_input_valid())
-	//{
-	//	usage();
-	//	return EXIT_FAILURE;
-	//}
-	Server server(SERVER_NAME, DEFAULT_PORT, initWSA);
-
-	if (initWSA) {
-		std::cout << "Server start.... " << std::endl;
+	
+	
+	Parser p(argv, argc);
+	if (!p.isInputValid()) {
+		usage();
+		exit(0);
 	}
-	else {
-		std::cout <<"WSAStartup failed " << std::endl;
-	}
+	
+	
 
+	
+	Server server(SERVER_NAME, DEFAULT_PORT);
+
+	
 
 
 }

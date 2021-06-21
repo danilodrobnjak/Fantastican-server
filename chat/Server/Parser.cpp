@@ -3,7 +3,7 @@
 
 Parser::Parser(int argc, char** argv) {
 
-
+	m_inputValid = true;
 	for (int i = 1;i < argc;i++) {
 
 		m_smartQueue.push(argv[i]);
@@ -16,7 +16,7 @@ Parser::Parser(int argc, char** argv) {
 
 bool Parser::isInputValid() {
 
-	return false;
+	return m_inputValid;
 
 }
 
@@ -72,6 +72,7 @@ void Parser::resolveProblemQueue() {
 		}
 		case HOST: 
 		{
+			//getHostByName()
 			//napraviti fju validacije za host
 			if (!Validate_It(temp)) {
 				//std::cout << "Ne valja ip";
@@ -82,8 +83,7 @@ void Parser::resolveProblemQueue() {
 		}
 		default:
 		{
-			//std::cout << "Usli smo ovde";
-			throw new E_Parser("Ove komande parser ne prepoznaje!");
+			m_inputValid = false;
 		}
 			
 

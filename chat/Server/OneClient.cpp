@@ -3,15 +3,15 @@
 OneClient::OneClient(SOCKET& ClientSocket, std::shared_ptr<SharedElement> socketToProcess)
     :m_ClientSocket(ClientSocket), m_socketToProcess(socketToProcess){
  
-    m_read = std::make_shared<Read>(m_ClientSocket);
+  //  m_read = std::make_shared<Read>(m_ClientSocket);
     m_write = std::make_shared <Write>(m_ClientSocket);
 
     m_state = new ClientRegistration(m_ClientSocket,&m_name, m_socketToProcess);
 
   
-   citanje = std::thread (&Read::run, m_read);
-   pisanje = std::thread(&Write::run, m_write);
-   hookMessageCome(m_read);
+   //citanje = std::thread (&Read::run, m_read);
+  // pisanje = std::thread(&Write::run, m_write);
+   //hookMessageCome(m_read);
 }
 OneClient::~OneClient() {
 
@@ -22,8 +22,8 @@ OneClient::~OneClient() {
     //     closesocket(ClientSocket);
     //     WSACleanup();
     // }
-    citanje.join();
-    pisanje.join();
+    //citanje.join();
+    //pisanje.join();
     closesocket(m_ClientSocket);
     std::cout << "Klijent destr" << std::endl;
 }
@@ -49,7 +49,8 @@ bool operator!=(const OneClient& one, const OneClient& two) {
 }
 
 void OneClient::sendMessageToClient(std::string &message) {
-    m_write->messageToWrite(message);  
+     send(m_write->m_clientSocket,m_write-> m_sendbuf, m_write->m_sendbuflen, 0);
+    //m_write->messageToWrite(message);  
 }
 
 void OneClient::messageCome( std::string& message) {
@@ -58,6 +59,7 @@ void OneClient::messageCome( std::string& message) {
     m_state = m_state->nextState(); 
   
 }
+
 
 void OneClient::hookMessageCome(std::shared_ptr<Read> read) {
     __hook(&Read::MessageCome,read.get(),&OneClient::messageCome);

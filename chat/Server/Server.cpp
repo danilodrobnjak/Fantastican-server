@@ -1,17 +1,14 @@
 #include "Server.h"
 
 
-Server::Server(std::string name, std::string port, bool &initWsa)
+Server::Server(std::string name, std::string port)
     :m_name(name), m_port(port) {
 
     m_ListenSocket = INVALID_SOCKET;
     m_clients = {};
     m_connectedClients = {};
 
-    if (!initWSA())
-        initWsa = false;
-    else {
-
+   
         int iResult;
         struct addrinfo* result = NULL;
         struct addrinfo hints;
@@ -54,7 +51,7 @@ Server::Server(std::string name, std::string port, bool &initWsa)
             closesocket(m_ListenSocket);
             WSACleanup();
         }
-        initWsa = true;
+       
 
          m_runThread = std::thread (&Server::run, this);
          m_addNewClientThread = std::thread(&Server::addNewClient, this);
@@ -63,14 +60,14 @@ Server::Server(std::string name, std::string port, bool &initWsa)
          m_chatMessageThread = std::thread(&Server::chatMessage, this);
          m_clientLeftTheChatThread = std::thread(&Server::clientLeftTheChat, this);
          m_deleteClient = std::thread(&Server::deleteClient, this);
- 
+     //    m_dispatch = std::thread(&Server::dispatch, this);
 
     }
 
 
     
 
-}
+
 
 Server::~Server() {
 
@@ -81,46 +78,93 @@ Server::~Server() {
       m_chatMessageThread.join();
       m_clientLeftTheChatThread.join();
       m_deleteClient.join();
+      m_dispatch.join();
 
     closesocket(m_ListenSocket);
     WSACleanup();
 }
 
-bool Server::initWSA() {
 
-    WSADATA wsaData;
-    int iResult;
-
-    // Initialize Winsock
-    iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (iResult != 0) {
-        return false;
-    }
-
-    return true;
-}
 
 void Server::run() {
 
     SOCKET ClientSocket = INVALID_SOCKET;
- 
+    fd_set masterRead;
+    fd_set masterWrite;
+    FD_ZERO(&masterRead);
+    FD_SET(m_ListenSocket, &masterRead);
+    FD_ZERO(&masterWrite);
+    FD_SET(m_ListenSocket, &masterWrite);
+
+    std::cout << "br listenSocketa : " << m_ListenSocket<<std::endl;
     while (true) {
 
-        ClientSocket = accept(m_ListenSocket, NULL, NULL);
-        if (ClientSocket == INVALID_SOCKET) {
-            printf("accept failed with error: %d\n", WSAGetLastError());
-            closesocket(m_ListenSocket);
-            WSACleanup();
+        fd_set copyRead = masterRead;
+        fd_set copyWrite = masterWrite;
+
+        int socketCount = select(0, &copyRead,nullptr, nullptr, nullptr);
+
+        for (int i = 0;i < socketCount;i++) {
+
+            SOCKET sock = copyRead.fd_array[i];
+            SOCKET sockWrite = copyWrite.fd_array[i];
+            if (sock) {
+                if (sock == m_ListenSocket) {
+                    //accept
+
+
+
+
+                    ClientSocket = accept(m_ListenSocket, NULL, NULL);
+                    if (ClientSocket == INVALID_SOCKET) {
+                        printf("accept failed with error: %d\n", WSAGetLastError());
+                        closesocket(m_ListenSocket);
+                        WSACleanup();
+                    }
+                    auto client = std::make_shared<OneClient>(ClientSocket, socketToProcess);
+
+                    m_clients_mutex.lock();
+                    m_clients.push_back(client);
+                    m_clients_mutex.unlock();
+
+                    FD_SET(client->getSocket(), &masterRead);
+                    FD_SET(client->getSocket(), &masterWrite);
+                }
+                else // It's an inbound message
+                {
+                    char buf[4096];
+                    ZeroMemory(buf, 4096);
+
+                    // Receive message
+                    int bytesIn = recv(sock, buf, 4096, 0);
+                    if (bytesIn > 0) {
+                        for (auto c : m_clients) {
+                            if (c->getSocket() == sock) {
+                                std::string message = buf;
+                                c->messageCome(message);
+                                break;
+                            }
+                        }
+                    }
+
+
+                }
+            }
+            else if (sockWrite) {
+
+            }
         }
-
-        auto client = std::make_shared<OneClient>(ClientSocket,socketToProcess);
-
-        m_clients_mutex.lock();
-        m_clients.push_back(client);
-        m_clients_mutex.unlock();
+        
+        }
     }
+           
+        
 
-}
+
+       
+    
+
+
 
 void Server::addNewClient() {
    
@@ -199,7 +243,7 @@ void Server::tryToConnect() {
            }
            else {
                     bool find = false;
-                    m_connectedClients_mutex.lock_shared();
+                    m_connectedClients_mutex.lock();
                     for (auto c : m_connectedClients) {
                               
                              if (c.first->getSocket() == client->getSocket()) {
@@ -211,7 +255,7 @@ void Server::tryToConnect() {
                                      break;
                              }
                     }
-                    m_connectedClients_mutex.unlock_shared();
+                    m_connectedClients_mutex.unlock();
                     if (find) {
                              message = "Trazeni klijent je vec zatrazio vasu dozvolu za konekciju.\n";
                              client->sendMessageToClient(message);
@@ -237,7 +281,7 @@ void Server::tryToConnect() {
                                    m_clients[first]->setState(new HaveRequestForConnection(client->getSocket(), socketToProcess));
                                    m_connectedClients_mutex.lock();
                                    m_connectedClients.push_back(std::make_pair(m_clients[first], m_clients[second]));
-                                   m_connectedClients_mutex.unlock();
+                                   m_connectedClients_mutex.unlock_shared();
                            }
                    }
        
@@ -303,7 +347,7 @@ void Server::responseToConnect() {
 
  
         std::string message;
-        m_connectedClients_mutex.lock();
+        m_connectedClients_mutex.lock_shared();
         for (unsigned i = 0; i < m_connectedClients.size(); i++) {
 
             if ((m_connectedClients[i]).second->getSocket() == client->getSocket()) {
@@ -323,7 +367,7 @@ void Server::responseToConnect() {
 
             }
         }
-        m_connectedClients_mutex.unlock();
+        m_connectedClients_mutex.unlock_shared();
 
         m_clients_mutex.unlock_shared();
      
@@ -346,7 +390,7 @@ void  Server::clientLeftTheChat() {
 
 
         std::string message = client->getName() + " has left the chat\n";
-        m_connectedClients_mutex.lock();
+        m_connectedClients_mutex.lock_shared();
         for (unsigned i = 0; i < m_connectedClients.size(); i++) {
 
             if ((m_connectedClients[i].first)->getSocket() == client->getSocket()) {
@@ -363,7 +407,7 @@ void  Server::clientLeftTheChat() {
             }
 
         }
-        m_connectedClients_mutex.unlock();
+        m_connectedClients_mutex.unlock_shared();
 
         m_clients_mutex.unlock_shared();
      
@@ -379,7 +423,7 @@ void Server::deleteClient(){
        // std::cout << "cekao pocelo brisanje";
 
         std::shared_ptr<OneClient> client;
-       // m_clients_mutex.lock();
+        m_clients_mutex.lock();
        // std::cout << "uzeo lock";
         for (auto c : m_clients) {
             if (c->getSocket() == m_clientLeftAppToProcess) {
@@ -421,7 +465,37 @@ void Server::deleteClient(){
                 break;
             }
         }
-       // m_clients_mutex.unlock();
+        m_clients_mutex.unlock();
 
+    }
+}
+void Server::dispatch() {
+   
+    while (true) {
+
+       // std::shared_ptr<OneClient> client;
+
+        for (auto elem : m_clients) {
+
+            auto prom = elem->getSocket();
+            struct timeval timeout;
+            timeout.tv_sec = 2000;
+            timeout.tv_usec = 0;
+            struct fd_set fdw;
+            FD_ZERO(&fdw);
+            struct fd_set fdr;
+            FD_ZERO(&fdr);
+            FD_SET(prom, &fdw);
+            FD_SET(prom, &fdr);
+
+
+            int returnSelect = select(0, &fdr, &fdw, nullptr, &timeout);
+            if (returnSelect > 0) {
+            
+
+            
+            }
+
+        }
     }
 }

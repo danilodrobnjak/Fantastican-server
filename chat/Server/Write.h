@@ -24,7 +24,7 @@ public:
 	void messageToWrite(const std::string& message);
 
 
-private:
+//private:
 	char m_sendbuf[DEFAULT_BUFLEN];
 	int m_sendbuflen = DEFAULT_BUFLEN;
 	SOCKET m_clientSocket;
